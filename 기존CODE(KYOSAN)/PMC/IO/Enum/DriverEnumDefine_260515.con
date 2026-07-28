@@ -1,0 +1,274 @@
+#DECLARE ENUM
+
+//DEVICENET
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+DnetDisEn         Disable       Enable
+DnetCommSts       Offline       Online
+APCCmd            None          Close        Open         PressCtrl    PosCtrl      Hold
+APCIndAddr        0             1            2            3            4            5            6            7            8
+APCIndCtrl        None          FrClose      FrOpen       UnFreeze
+APCVlvSts         Unknown       Sync         PosCtrl      Closed       Open         PresCtrl     Hold         Learn        PwrFail      Safety       Fatal        IntOpen      IntClose
+APCRst            None          WarnRst      FatalRst
+APCZero           None          ZeroAdjust
+APCSlvSts         Init          Sync         PosCtrl      Closed       Open         PressCtrl    Hold         Learn        PwrFail      Safety       Fatal        IntOpen      IntClose     FrOpen       FrClosed     Unknown   Offline
+APCErr            None          SensorErr    FirmwareErr
+APCWarn           None          ReqService   LearnErr     PFONotRdy    AirNotRdy
+APCFatalErr       None          E20          E22          E40
+LocalRemote       None          Local        Remote       Locked
+aMode             Unknown       Local        Remote       Locked
+aSetType          PressCtrl     PosCtrl
+aCtrlMod          None          Close        Open         Control      Hold
+aExcept           Unknown       Normal       Alarm        Warning      AlmWarn
+aSts              Unknown       Sync         Position     FullClose    FullOpen     Pressure     Hold         Learn        PwrFail      SafetyMode   FatalError
+aVlvSts           Unknown       Sync         Pos          Closed       Open         CF           Serv         PwrFail      AirFail      Offline
+MatOpMode         Manual        Auto         Remote       Freeze       DCAuto
+MatErrSts         None          Fault
+MatTune           NotTuned      Tuned
+InExtern          Internal      External
+GenOnOff          Off           On
+GenRegMode        Unknown       Pi           Pl           Pr           Udc
+GenOpMode         Unknown       Panel        Service      RS232        Profibus      RS485       Remote1      Remote2      Remote3      User1       DeviceNet  	DeviceNet1
+GenTubeSts        Normal        Warning
+GenRdySts         NotReady      Ready
+GenReset          Cancel        Reset
+GenError          NoError       Error
+GenRampUp         NotUse        Use
+GenRampUpCh       Pi            Pr           Udc          Urf          Irf          Pl
+GenOvrTemp        TempOver      TempOK
+GenIntlk          Intlked       IntlkOK
+GenRegModeD       Unknown       Pi           Pl           Pr           Udc          Urf          Irf
+GenErr            NoError       Error
+GenWarn           NoWarning     Warning
+GenMatchSts       Others        Auto
+GenRamp           RampEnd       Ramping
+eRFOpMod          NotUsed       Panel        Service      RS232        Profibus    RS485         Remote1       Remote2      Remote3      User1       DeviceNet  DeviceNet1
+eMacSts           NoError       Error
+ePulseSync        Single        SyncActive
+eMatIntlk         IntlkOff      IntlkOn
+eArcMode          Gradient      Level
+RF_Remote         Rem_Off       Rem_ON
+eMatMode          Auto	        Manual
+eMatMove		 		 	None					Move
+
+//APC 
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+eAPCCommSts				 Offline				 OnLine
+eAPCDisEn		  		 Disable       Enable
+eAPCCmd            None          Close        Open         PressCtrl    PosCtrl      Hold
+eAPCIndAddr        0             1            2            3            4            5            6            7            8
+eAPCIndCtrl        None          FrClose      FrOpen       UnFreeze
+eAPCVlvSts         Unknown       Sync         PosCtrl      Closed       Open         PresCtrl     Hold         Learn        PwrFail      Safety       Fatal        IntOpen      IntClose
+eAPCRst            None          WarnRst      FatalRst
+eAPCZero           None          ZeroAdjust
+eAPCSlvSts         Init          Sync         PosCtrl      Closed       Open         PressCtrl    Hold         Learn        PwrFail      Safety       Fatal        IntOpen      IntClose     FrOpen       FrClosed     Unknown	Offline
+eAPCErr            None          SensorErr    FirmwareErr
+eAPCWarn           None          ReqService   LearnErr     PFONotRdy    AirNotRdy
+eAPCFatalErr       None          E20          E22          E40
+eLocalRemote       None 				 Local        Remote       Locked
+
+
+//C3
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+C3CommSts         OFFLINE       ONLINE
+
+//VVC_MOTOR                                                                                                                                                                                                                                                                                                                               
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
+
+eVVCCommSts       OFFLINE       ONLINE
+ServoOffOn	 			SVOff_0				SVOn_1
+MotorOffOn        MotorOff_0    MotorOn_1
+MotorHome         NotHome_0     Home_1
+MotorABS          ABS_Idle_0		ABS_Move_1
+MotorInc          INC_Idle_0		INC_Move_1
+PortClose	  			NotClose_0		Close_1
+SlaveDisEn        NoExist_0			Exist_1
+SaveAllDisEn      Diable_0 			Enable_1
+AlmNonRst	 			  None_0  			Alm_Reset_1
+NoClrClr					NoClr_0  			Clr_1
+MotorIdleRun      M_Idle_0			M_Run_1
+AXISOffOn	 				Off_0					On_1
+VVCError				  NoError_0			Error_1
+BrdTypeNo         0             1            2            3            4            5            6            7            8
+AlmType		 				NoAlarm_0 		OverCurr_1	 OverSpeed_2 	StepOut_3 	 OverLoad_4 	OverTemp_5 	 BackEMF_6 	  MotConn_7 	 EncConn_8 	 MotPower_9	 InPos_10 	SysHalt_11 	ROMDev_12 	Alarm_13	 OverInVol_14	 PosOverfl_15  
+CommOffOnSet     None_0  Offline_Set       Online_Set
+
+//CHILLER
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+CHLMode						Local			Remote
+RTDMode         	Int_Sup		Int_Rtn																				
+RTDModeBTM      	Int_Sup		Int_Rtn		Ext													 							
+RTDMode3        	Int_Sup		Int_Rtn																				
+CHLCmd          	Stop			Run
+eChillerComm			Offline		Online
+eChillerDisEn			Disable		Enable
+
+
+//DRY PUMP SOCKET_EIP
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+eDP_CommSts     	OFFLINE      ONLINE
+eDP_DisEn       	DISABLE      EANBLE
+DisEn           	Disable       Enable
+CommSts         	Offline       Online
+eDpCommStat     	Offline      Online
+dpRunStop       	Stop         Run
+dpNorAlm        	Normal       Alarm
+dpOffOn						Off          On
+dpClOp						Close        Open
+dpRmtLoc					UNKNOWN 	LOCAL 	REMOTE
+dpSts							UNKNOWN 	STOP	STOP_RUN FAULT 	RUN_STOP RUN
+
+//DRY TRAP
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+eTRAPCommSts      OFFLINE       ONLINE
+
+
+//EPD 
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+eEPDConnect				None	Connect	 Reconnect  Disconnect
+eEPDCMD_MSG				None	RESET	 TEST	 PRESENT    VERSION    CFGLIST    WAFERINFO    START    STOP    PAUSE    CONTINUE    COMPLETE
+eEPDStatus				None	OK	FAIL
+eEPDCOM_STS				None	Online  Offline  Offline_HW
+eEPDEVE_MSG				None	End_Point  Local    Remote    Running    Ready    NotReady    UserEve	Matrix    DataBlock    Error    PowerUp    Err_Ack    Use_Err
+
+//ESC 
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++                                                                                      
+eESCError         NORMAL        ERROR                                             
+eESCMode          LOCAL         REMOTE                                            
+eESCPower         OFF           ON                                                
+eESCToggle        NONE          TOGGLE                                            
+eESCCommSts       OFFLINE       ONLINE                                           
+eESCDisEn         DISABLE       ENABLE  
+
+
+//MFC 
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++                                                                                      
+eMfcCommSts				OFFLINE			ONLINE                                                                               
+eMfcDisEn					DISABLE			EANBLE
+
+
+//HEATER 
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++                                                                                      
+EJ1_COMM					OFFLINE			ONLINE
+EJ1_CTRL					RUN
+EJ1_ENDCODE				NORMAL 			FINS PARITY FRAMING OVERRUN BCC FORMAT SUBADDRESS FRAMELENGTH ETC
+EJ1_OFFON					OFF					ON
+EJ1_MEMWRITE			BACKUP			RAM
+EJ1_AUTOTUNE			CANCEL			EXECUTE
+EJ1_RUN_CTRL			RUN					STOP
+EJ1_COMWRITEL			DISABLE			ENABLE
+EJ1_MODE					AUTO				MANUAL
+EJ1_SPMODE				LSP					RSP      
+EJ1_AT_STS				STOP				RUNNING
+
+
+//RACK TEMP 
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++                                                                                      
+eRackCommSts			OFFLINE		ONLINE
+eRackDisEn				DISABLE		EANBLE
+eCommand				NONE		SendCmd		StopCmd
+
+//TMP 
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++                                                                                      
+eTMPCommSts   		Offline				Online
+eTMPOpMode				Unknown				LOCAL					REMOTE			RS_232				RS_485
+eTMPSetOpMode			None					Offline				Online	
+eTMPRunSts				None					Stop					Accel				Decel					NormalRotation		FailStop		FailIdle		FailRegen		FailDecel						       
+eTMPOperation			None					AccelStart		DecelStart
+
+
+eTMPMode          Unknown       Levitate     NoLevitate   Accel        Normal       Brake        Autotest     Tune         TuneDone
+eTMPCmd           None          Stop         Start        Reset
+eTMPAlarm         None          Alarm
+eTMPDisEn					Disable			 	Enable
+
+
+//OMRON PLC                                                                                                                                                                                                                                                                                                                                 
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
+eNoneLocal				None_0						Local_1
+eNoneRemote				None_0						Remote_1
+eClOpUnkown				Close_0						Open_1						Unkown_2
+eNoFlow						NoFlow						Flow_1
+eAutoPM						Auto_0						PM_1
+eLoHi							Low_0							High_1
+eNormal						Nomal_0						Alarm_1  					
+eAlarm						Alarm_0  					Nomal_1
+eOffOn						off_0							on_1
+eOnOff						On_0							Off_1
+eEmsEnable				Nomal_0						EMS_Enable_1
+eEMOEnable				Nomal_0						EMO_Enable_1
+eDisEn						Disabled_0				Enabled_1
+eTeachAuto				Teach_0						Auto_1
+eAutoTeach				Auto_0						Teach_1
+eMCOffOn					MC_Off_0					MC_On_1
+eLeakCheck				Leak_0						Nomal_1
+eOffNomal					Off_0							Nomal_1
+eOpCl							Open_0						Close_1
+eClOp							Close_0						Open_1
+ePush							NotPush_0					Push_1      
+ePostion					Unknown_0					PositionOK_1  
+eRequest				  Nomal_0  					Request_1
+eUpStatus1 				Unknown_0					Up_1
+eDownStatus1 			Unknown_0					Down_1
+eUpStatus0 				Up_0							Unknown_1
+eDownStatus0 			Down_0						Unknown_1
+eLockStatus 			Unknown_0					Lock_1 
+eUnLockStatus 		Unknown_0					UnLock_1 
+eDisCon						Disconnection_0		Connection_1
+eOpenNomal				Open_0						Nomal_1
+eAlarmRun					Alarm_0						Run_1
+eUnknownOp				Unknown_0					Open_1
+eUnknownCl				Unknown_0					Close_1
+eOKAlarm					OK_0							Alarm_1
+eAlarmOK					Alarm_0						OK_1
+eNoUnNomal				Nomal_0						UnNomal_1
+eNomalHigh				Nomal_0						High_1
+eNomalLow					Nomal_0						Low_1
+eLockUnLock				Lock_0						UnLock_1
+eWarnNomal				Warning_0					Nomal_1
+eNomalWarn				Nomal_0						Warning_1
+eIONSTATE       	IG_Off_0          IG_On_1	
+eLocRem						Local_0						Remote_1
+eNotAccel					NotAccel_0				Accel_1
+eBrake						NotBrake_0				Brake_1
+eNotNomal					NotNomal_0				Nomal_1
+eOffRun						Off_0							Run_1
+eOffInhibit				Off_0							Inhibit_1
+eOffLowSpeed			Off_0							LowSpeed_1
+eOffStop					Off_0							Stop_1
+eOffReset					Off_0							Reset_1            		            		
+eOtherAlive				Other_0						Alive_1
+eEmerNom					Emergency_0				Nomal_1
+eEMSNom						EMS_0							Nomal_1
+eUnVac						NotVac_0					Vac_1
+eUnATM						NotAtm_0					ATM_1
+eStopRun					Stop_0						Run_1
+eNotReady					NotReady_0				Ready_1
+eNomPro						Nomal_0						Protect_1
+eNomalAlm					Nomal_0						Alarm_1
+eVacAtm         	Vac_0   		   		ATM_1
+ePrsSns         	Unknown1_0    		ATM_1 		 			Vacuum_2    		Unknwon2
+eBothLeakCheck    Leak_0						OneErr_1				TwoErr_2   			Normal_3
+eVitalSign      	o_0           	 	Q_1
+eAbsPre         	Absent_0       		Present_1
+eGlsAbsPre      	NoGlass_0      		GlassIn_1
+eIdleReq        	Idle_0        		Request_1
+eOpClErr       		Unknown_0     		Open_1         	Close_2        	Error_3
+//eTmpStatusD     Levitation   			Accel        		Normal       		Error       	Brake       Error_5   	Error_6     Error_7  
+eTmpStatusD     	Levitation   			Normal        	Accel       		Error       	Brake       Error_5   	Error_6     Error_7    
+eTmpCmdD        	None_0        		Start_1        	Stop_2         	None_3        Reset_4      
+ePmcPlc         	NOACTION_0    	  MODE_CHANGE_1
+eRelGrip        	Release_0      		Grip_1          
+eIdleAlarm      	Idle_0         		Alarm_1     
+eIdleIlk        	Idle_0         		Interlock_1
+eNoneACK        	None_0         		ACK_1    
+eNoneReset      	None_0         		RESET_1  
+eIdleBusy       	Idle_0         		Busy_1   
+eIdleError      	Idle_0         		Error_1
+eServoRdy       	NotReady_0     		Ready_1
+eMcPosition     	Moving_0      	  POS01_0mm 			POS02_9mm    POS03_25mm    POS04_75mm  POS05_120mm	  POS06_45mm	POS07_100mm	POS08_35mm	POS09_45mm	POS10_100mm
+eIdleMove       	Idle_0        	  Move_1
+eNoStop         	None_0         		Stop_1    
+eClsSlowFast    	Close_0       	  Fast_1         	Slow_2         All_3   
+eNomalOpen				Nomal_0						Open_1
+eNoneFlow					None_0						Flow_1                                                                                 
