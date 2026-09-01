@@ -1,0 +1,31 @@
+//#DECLARE	PRE_ACTION_LIST
+//[SEQ]	OBJ_PIN		THREAD	"READY"
+//[DIO]	dio1		MEMORY	1
+//[AIO]	aio1		NORMAL	1.0
+//[SIO]	sio1		NORMAL	""
+
+//#DECLARE	COMMAND_MAP
+//"COMMAND"	SEQUENCE	MODE	{ARGS}	: #COMMAND = Original Command String , #EXTRA=Command String after First Token , #ENUM:	= Use Enum String of DIO
+//"PIN_UP"		OBJ_PIN_CONTROL		THREAD	{#COMMAND}		
+//"PIN_DOWN"	OBJ_PIN_CONTROL		THREAD	{#COMMAND + ' ' + #EXTRA + ' ' + "TEST" + ' ' +#ENUM:Zone1Run + ' ' + APC_Position}		
+
+//#DECLARE	POST_ACTION_LIST
+//[SEQ]	OBJ_PIN		THREAD	"READY"
+//[DIO]	dio1		MEMORY	1
+//[AIO]	aio1		NORMAL	1.0
+
+//-----------------------------------------------------------------------
+#DECLARE	PRE_ACTION_LIST
+[DIO]		RF_CTRL	MEMORY	1
+
+#DECLARE	COMMAND_MAP
+
+										//LRF/HRF                               
+"FNC_RF_INIT"						FNC_RF_CTRL					NORMAL	{"MNT_RF_INIT"}
+"FNC_RF_ON"							FNC_RF_CTRL					NORMAL	{"MNT_RF_ON"}
+"FNC_RF_OFF"						FNC_RF_CTRL					NORMAL	{"MNT_RF_OFF"}
+"FNC_RF_PRESET"					FNC_RF_CTRL					NORMAL	{"MNT_RF_PRESET"}
+"FNC_RF_ABORT"					FNC_RF_CTRL					NORMAL	{"MNT_RF_ABORT"}
+
+#DECLARE	POST_ACTION_LIST
+[DIO]		RF_CTRL	MEMORY	0

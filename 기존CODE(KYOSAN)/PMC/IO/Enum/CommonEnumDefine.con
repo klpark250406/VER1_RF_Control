@@ -1,0 +1,246 @@
+
+#DECLARE ENUM
+
+//-------------   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// Enum name      	Enum 1       	Enum 2       Enum 3       	Enum 4       Enum 5       Enum 6       Enum 7         Enum 8       Enum 9         Enum 10       Enum 11       Enum 12      Enum 13
+//--------------   -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------   
+eConIdleRun					Idle					Run
+eConIdleRun2				Idle					Run						Disable
+eCurrentPM					PM1						PM2						PM3						PM4						PM5						PM6						PM7						PM8						PM9						PM10					PM11					PM12					PM13
+eChmVac							None					ATM						VAC
+eChmPwr							1							2							3
+eFNC_Status		 			UNKNOWN  			NOMAL
+eNoneEdit						NONE					EDIT
+eNoneCANCEL					NONE					CANCEL
+eNoneSave						NONE					SAVE 
+eCfgSave            NONE					SAVE
+eUseMode						NoUse			  	Use
+eGasMode						NoGas			  	NormalGas    ToxicGas
+eAlarmSts						ALARM_ABSENT 	ALARM_PRESENT
+PlotControl   			Idle  				Saving
+PlotDisplay	  			Idle					Plotting
+eMaintMode        	Init         	Abort        	Vent         	Pump         	Leakcheck
+eFncCtrl          	AVIALABLE    	RUN          	ABORT        	ABORTED
+eFncMode          	VAC          	VENT         	ISOLATION
+eFncPlcMode       	NONE				 	INIT					SYNC				  ACK						RESET
+ePMBoot           	Starting     	Started
+eEnDis        			Enable			 	Disble
+efAPCMode         	NONE         	FULLCLOSE    	FULLOPEN     	PressCtrl    	PosCtrl
+efRFMode          	NONE         	INIT         	PRESET       	POWEROFF     	POWERON    
+efAPCCtrl         	Idle         	Running				Aborted      	             	
+efESCMode         	NONE         	READY        	ESCON        	ESCOFF       	
+efcHeaterMode       NONE         	READY        	ALLSTART      ALLSTOP       	
+
+//KLP_EDIT
+efvvcMode			NONE		READY	PRESET	VVC_ALL_MOVE	VVC_CH01_MOVE	VVC_CH02_MOVE	VVC_CH03_MOVE	VVC_CH04_MOVE	VVC_CH05_MOVE	VVC_CH06_MOVE
+
+efHeMode		 				NONE		     	CLOSE					READY        	FLOW         	RELEASE     		DUMP
+efPinMode         	NONE         	INIT 					MOVE				 	TRANS_UP	    TRANS_DOWN 	  	MOVE_POS1 	CYCLE_TEST 
+efVACMode         	NONE         	PUMP         	VENT		 		 	CYCLE_PURGE_ATM	  CYCLE_PURGE_VAC
+efGasMode         	NONE         	AllClose     	AllOpen      	Purge
+efPMCtrl		 				NONE		     	INITIALIZE
+efPMCtrlSts		 			IDLE		     	RUNNING	    	ABORTED
+efRFCtrl		 				NONE    	   	RUN          	ABORT
+efRFSts           	IDLE         	RUNNING
+efPinPos          	NONE         	POS01 			  POS02      		POS03   			POS04    				POS05 
+efPinPosParticle    POS02      		POS03   			POS04 
+eFilterITK			  	NONE				 	AutoPM			  RunDown
+eESCSelect					BOTH				 	DOWNESC      	UPESC
+eLKCheckMode       	ONLYPC      	GASLINE_ALL                      
+eMccOffOn           MccOff      	MccOn
+eCfgCommSts					Offline				Online
+eCfgGenOpMode       Unknown       Panel        	Service      	RS232        	Profibus      	RS485       Remote1      	Remote2      	Remote3      User1       	DeviceNet  			DeviceNet1
+eCfgGenOnOff				Off						On
+eCfgGenRdySts       NotReady      Ready
+eCfgGenError        None          Error
+eCfgGenRegMode      Unknown       Pi           	Pl           	Pr           	Udc
+eCfgMatOpMode       Manual        Auto         	Remote       	Freeze       	DCAuto
+eCfgCHLMode         Local        	Remote       	             	             	
+eCfgCHLCmd          Stop         	Run          	             	             	
+eCfgRTDMode2        Int_Sup      	Int_Rtn      	Ext          	Ext_Elec     	
+eCfgRTDMode3        Int_Sup1	   	Int_Rtn1     	Ext1         	Int_Sup2     	Int_Rtn2      	Ext2
+eCfgRTDMode         Int_Sup      	Int_Rtn      	Ext          	             	              	
+eCfgLocalRemote     None          Local        	Remote       	Locked       	              	
+eCfgAPCVlvSts       Unknown       Sync         	PosCtrl      	Closed       	Open         		PresCtrl     Hold         Learn        	PwrFail      	Safety       Fatal        IntOpen      IntClose
+eCfgAPCErr          None          SensorErr    	FirmwareErr  	             	              	                                       	             	
+eCfgAPCWarn         None          ReqService   	LearnErr     	PFONotRdy    	AirNotRdy     	                                       	             	
+eCfgAPCFatalErr     None          E20          	E22          	E40          	              	                                       	             	
+eCfgaVlvSts         Unknown       Sync         	Pos          	Closed       	Open         		CF           Serv         PwrFail      	AirFail      	Offline
+//-------------   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// Enum name      	Enum 1       	Enum 2       Enum 3       	Enum 4       Enum 5       Enum 6       Enum 7         Enum 8       Enum 9         Enum 10       Enum 11       Enum 12      Enum 13
+//--------------   -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  
+eCfgTMPMode         Unknown       Levitate     	NoLevitate   	Accel        	Normal       		Brake        Autotest     Tune         	TuneDone
+eCfgTMPAlarm        None          Alarm
+eCfgdpRunStop       Stop         	Run
+eCfgdpOffOn			  	Off          	On
+eCfgdpClOp			  	Close        	Open
+eCfgdpNorAlm        Normal       	Alarm
+eCfgeAlarmIdle      Alarm        	Idle
+eCfgAPCCmd          None          Close        	Open         	PressCtrl    	PosCtrl      		Hold
+eCfgeMode           LOCAL         REMOTE
+eCfgePower          OFF           ON
+eCfgeError          NORMAL        ERROR
+eCfgeUnAtm          Unknown      	ATM
+eCfgeUnVac          Unknown      	VACUUM
+eCfgePrsSns         Unknown1     	ATM  					Vacuum    		Unknwon2
+eCfgDisEn						Disable				Enable
+eSensitivity      	0     			 	1     			 	2     			 	3      		  	4     					5     			 6     				 7      			8     				9
+eAlarmRecovery    	NONE         	ALARM        	ABORT        	MAINT
+eEnDisable        	Disable      	Enable
+eUseNoUse	     	 		Use	      	 	NoUse
+ePinPos           	NONE         	POS01				  POS02        	POS03  				POS04			 			POS05
+eGasNum							eGAS01				eGAS02			  eGAS03		 	 	eGAS04		 		eGAS05			 		eGAS06				eGA07			  eGAS08			  eGAS09			 eGAS10  	  eN2PURGE
+eDisCond     				eCheckPin    	eCheckTime
+eScrbOpt    				CFG_NONE     	CFG_WARN      CFG_ALARM
+eGasValve	  		  	GasProcess		GasPurge
+ePurgeOp				  	OpPressure		OpTime
+eHeAlarm   			  	HeNoAlarm   	HeYesAlarm
+eHeFunction       	NoReady    		Ready
+ePinCond    	    	DIO					 	AIO 					BOTH
+eRfSag							OFF						ON          	
+eRTD		     		 		Int.RTD	  	 	Ext.RTD     	
+ePinPLC							PLC_NoCheck 	PLC_Check   	
+eATMSW							BOTH					SWITCH1				SWITCH2
+eEPDAlarm				  	None					Warning     	AutoPM				Abort 
+eStripChamber		  	eStrip			  eNoStrip	
+eWarnAlarm					OnlyAlarm		  EQFault       NoUse				
+HeTMDown						TMNoDown			TMDown
+ePurgeOffOn	      	NONE	        PURGE
+eZeroCheck					NONE				  CHECK
+ePurgeRun						NoRun				  Running
+eSetLock				  	UnLock				Lock
+ePCProcess				  NONE					ACTIVE		    GATE				 DESCUM				OCTA_SD   SD				 
+eDPSelect						EDWARD				KASHIYAMA												
+eTMPSelect					EDWARD				SHIMADZU
+eRFPWRON						Interface			DeviceNet
+
+//-------------   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  
+// Enum name      	Enum 1       	Enum 2       Enum 3       	Enum 4       Enum 5       Enum 6       Enum 7         Enum 8       Enum 9         Enum 10       Enum 11       Enum 12      Enum 13    
+//--------------   -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  
+ePurgeMFC						Gas01					Gas02					Gas03					Gas04					Gas05					Gas06				Gas07					Gas08					Gas09					Gas10
+cArcMode            Gradient     	Level
+cRampUpSet          NoAction     	RampUp
+cRFStepCtrl         CtrlOff      	CtrlOn
+cRFFirstOn				  eSource			 	eBias
+eStepType         	NONE         	CONDITION    	TIME         	DISCHARGE    	FINISH      	EPD
+ePresPosition     	NONE	       	FULLCLOSE    	POSITION     	PRESSURE     	FULLOPEN
+eRfType           	OFF          	ON           	PresetON     	RampUp       	RampDown
+eRfContinue       	Cut          	Continuous
+eTimePercent      	Time         	Precent
+eMotionPos        	NONE         	POS01 				POS02   			POS03 				POS04   			POS05  			POS06  				POS07  				POS08  				POS09  				POS10
+eUpDownEtc        	None         	UP           	DOWN
+eMovStyle         	Type_1       	Type_2       	Tyupe_3
+eGripRelease      	None         	Grip         	Release
+eHelium           	Close        	Ready        	Flow         	Release      	Dump
+eExtAbort         	ExIDLE       	ExABORT
+eGlsSts					  	NONE         	UNKNOWN1			PRESENT			 	SUCCESS				FAILURE				PROCESSING	UNKNOWN2
+eOvrEtchType	 			NONE         	TIME         	PERCENT
+eEPDAlmUse		 	  	USE          	NO	
+eRfRAMPUSE			  	RAMPUP			 	STEPUP
+eRfPreset						NONE 			   	TABLE01				TABLE02			 	TABLE03				TABLE04      	TABLE05    	TABLE06				TABLE07  			TABLE08  			TABLE09				TABLE10
+eVVCManual					SET01 			  SET02					SET03	
+eVVCManualRCP				SET01 			  SET02					SET03					NOUSE	 					
+ePR_StepType      	NONE         	CONDITION    	TIME_END     	DISCHARGE    	FINISH       	EPD_END         
+eSkipStep         	SKIP         	PROCESS                                                             
+eItemLock         	IDLE         	LOCK                                                                             
+PopupCtl		 		  	None			 	 	Close					Open
+RecvAct			 				None         	StepJump			Run					 	ProcAbort	  	NextStep 			PrevStep
+RecvAct1		 				None         	StepJump			ProcAbort                 	
+RecvAct2		      	None         	Run						ProcAbort                 	
+PopupType         	NONE 				 	PR_ALARM	    PR_JUMP		   	PR_TIME		  	PR_STEP
+eChuckStep          CHUCK_NONE    CHUCK_STEP1   CHUCK_STEP12  CHUCK_STEP123
+eStepJump		  	  	NONE			   	STEP_JUMP
+eStepRetry		    	NONE			   	STEP_RETRY    
+eNoYes							No					 	Yes
+eStripProess		  	NONE				 	READY			  	FLOW			   	PURGE			 		CLOSE
+ePinMovePos					NONE				 	DOWNSET01			DOWNSET02		 	DOWNSET03 		DOWNSET04			DOWNSET05		DOWNSET06			DOWNSET07				DOWNSET08			DOWNSET09			DOWNSET10	
+ePin1StepPos				POS_2				 	POS_3					POS_4
+PrcsButCtl        	Idle         	Pause        	Resume       	Stop         	Abort
+PrcsButUse        	Idle         	Running
+PrcsSts           	Idle         	Running
+OffOnBlink        	Off          	On           	Blink
+OffOn             	Off          	On
+ePro_Con						Idle	  			Pro_Start 	 	Pro_End				Pro_Fail
+eGlass_Check			  NoCheck				YesCheck
+eAutoDechuck        NoAction      AutoDecuck
+eRunEmPState				EmPIdle				EmPRun		 		EmpError     	EmpWait   	EmpStop
+eRunCountSts				CountIdle     CountRun			CountError		CountWait		CountStop			 				
+eEmptyProcOp       	NoProcess			IdleProcess
+eCountProcOp				NoProcess			CountProcess
+eModeProcess1			 	Emp_Proc		 	Normal_Proc		
+eModeProcess2			 	Count_Proc		Normal_Proc
+eCfgSave1						INIT					LOAD					SAVE					ADAPT				CANCEL
+//-------------   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------   
+// Enum name      	Enum 1       	Enum 2       Enum 3       	Enum 4       Enum 5       Enum 6       Enum 7         Enum 8       Enum 9         Enum 10       Enum 11       Enum 12      Enum 13     
+//--------------   -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------   
+eAutoLKPinOP		    PinUse			 	PinNoUse
+eAutoLKPinPos			  PinNo					PinPos1				PinPos2				PinPos3				PinPos4				PinPos5			
+eAutoLKUseOP        NoCheck				LeakCheck
+eAutoLKRun				  AutoLK_Idle		AutoLK_Run		AutoLK_Error	AutoLK_Wait		AutoLK_Stop		AutoLK_Idle2
+eGasLinePump		    Gas_None			Gas_Select 		Gas_All		
+eRecipe_InOut				RecipeOut			RecipeIn
+eUseGauge						CDG2					IonGauge
+eZeroOne          	NONE        	CHECK
+eCheckMode        	MANUAL       	AUTO 
+eAlarmIdle		  		Alarm		   		Idle        
+eAlarmRcv         	NONE        	ALARM        	ABORT        	MAINT                                                          
+eScreenOKNG       	eNG       		eOK          	             	
+eChamMode         	PM_Unuse     	PM_Local     	PM_DisConn   	PM_Standby   	PM_Maint    
+eNgReady          	NotReady     	SystemReady  	             	             	
+eAutoVacAtm       	AUTO         	VAC          	ATM          	             	
+eEnaDis           	Disable      	Enable                     	             	
+eLockRele         	UNLOCKED     	LOCKED                     	             	
+CTCControl        	Idle         	Running     	Pausing      	Paused       	Aborting      Disable
+CtrlOffOn         	Off          	On                         	
+eTMPAll           	None 				 	AllStop  	  	AllStart 		 	AllReset      Stop 			  	Start      		Reset
+eForeAll          	None 				 	AllClose 	  	AllOpen      	Close					Open
+eApcAll           	None 				 	Close 	  		Open         	
+eFRCLine          	None 				 	AllClose 	  	FlowSET      	ZeroSET			
+eArGasLine        	None 				 	Close 	      Process      	
+eLMFCLine         	None 				 	Close 	 		  Flow         	ByPass	
+eHeaterControl      None 				 	AllStart 	    AllAutoTune   PIDReport     			 
+eSysStatus        	Idle         	Maint       	Ready        	Process      	Complete     	Abort 
+eProsAbort        	Idle         	Abort
+eVrfOffOn         	Off          	On						Dual
+eTimerRun         	Stop         	Run
+eEscOffOn         	Off          	On
+eRfStyle          	RF_IDLE      	RF_OFF       	RF_HIGH      	RF_LOW       	RF_BOTH
+eRfStyle2         	RF_OFF       	RF_HIGH      	RF_LOW       	RF_BOTH      	
+eSysAlarm         	NoAlarm      	Alarm        	             	             	
+acStatus          	ATM          	Vacuum       	GoATM        	GoVacuum     	Abort
+VacStatus2        	Vacuum       	ATM          	GoATM        	GoVacuum     	Abort
+eMainStep         	NormalStep   	MainStep     	
+eEscState         	NotReady     	READY        	
+eGasLine          	None         	Close        	Purge        	Dump         	Process
+eHeLine	          	None         	Close        	Flow         	Dump         	AllCose
+eAllGasLine       	None         	AllClose
+eProcCtrl		 				NONE   			 	RUN          	ABORT
+eProcSts          	IDLE         	RUNNING      	ABORTED
+eProcRecv		  			NONE		  	 	RETRY					ABORT					GOALARM
+eRstGlsCnt		 	  	NONE         	RESET
+eProcMode	  	  		NORMAL			 	AGING					
+ePmRunMode        	NORMAL			 	TRANSFER
+eProcAlarm		 	  	NONE         	ALARM
+eAlarmDislpay     	NONE         	YELLOW       	RED
+eEditCnt          	NONE         	EDITING      	
+eHWCheck          	NONE         	LEAKCHECK    	ROR_CHECK			GASLINE_CHECK
+ePmMode           	NOT_USE      	ENABLE       	DISABLE      	DISABLE_HW   ENABLE_PM
+eMaintReq         	IDLE         	REQUEST
+eProcState        	NONE         	INIT         	IDLE         	SETUP        READY        	EXECUTING     PAUSE
+eConsoleView      	NONE         	VIEW         	             	                          	
+eEqStat		     	  	EQ_NONE      	EQ_NORMAL    	EQ_FAULT     	EQ_PM                     	
+eInitState					INIT_NOUSE	 	INIT_USE			
+eInitRun						INIT_NORUN	 	INIT_RUN
+eLogRun					  	LogNoReport  	LogReport
+eAlarmBlink       	OFF          	ON
+CtrlProcSTS					NONE					IDEL_PROC			COUNT_PROC
+SignalTower					OFF						ON						Blink
+eNormalLeak					Normal				Leak
+DataLopOp	  				NoReport			Reporting   
+eLogDisEn		  			Disable				Enable   
+eScreenAlarm				None   				Warning    		Alarm   
+eTolerance					NONE					WARN					ABORT					OK
+eSeqRunSts					Idle					Running	 			Aborted
+eHeMaxFlowOption    NONE          ONLY_PC				PC_PLC_BOTH   ALL_CASE
+
+ePascalPress  	  Float		Explont
