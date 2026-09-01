@@ -30,7 +30,10 @@ efRFMode          	NONE         	INIT         	PRESET       	POWEROFF     	POWER
 efAPCCtrl         	Idle         	Running				Aborted      	             	
 efESCMode         	NONE         	READY        	ESCON        	ESCOFF       	
 efcHeaterMode       NONE         	READY        	ALLSTART      ALLSTOP       	
-efvvcMode					  NONE         	READY        	OFFLINE_SET		ALARM_RESET		HOME_MOVE				VVC_ALLSET		VVC01_SET     VVC02_SET				VVC03_SET		VVC04_SET			VVC05_SET
+
+//KLP_EDIT
+efvvcMode			NONE		READY	PRESET	VVC_ALL_MOVE	VVC_CH01_MOVE	VVC_CH02_MOVE	VVC_CH03_MOVE	VVC_CH04_MOVE	VVC_CH05_MOVE	VVC_CH06_MOVE
+
 efHeMode		 				NONE		     	CLOSE					READY        	FLOW         	RELEASE     		DUMP
 efPinMode         	NONE         	INIT 					MOVE				 	TRANS_UP	    TRANS_DOWN 	  	MOVE_POS1 	CYCLE_TEST 
 efVACMode         	NONE         	PUMP         	VENT		 		 	CYCLE_PURGE_ATM	  CYCLE_PURGE_VAC

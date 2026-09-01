@@ -25,7 +25,7 @@ MatOpMode         	Manual        	Auto         Remote       Freeze       DCAuto
 MatErrSts         	None          	Fault
 MatTune           	NotTuned      	Tuned
 InExtern          	Internal      	External
-GenOnOff          	Off           	On
+GenOnOff          	Off_0           On_1
 GenRegMode        	Unknown       	Pi           Pl           Pr           Udc
 GenOpMode         	Unknown       	Panel        Service      RS232        Profibus      RS485       Remote1      Remote2      Remote3      User1       DeviceNet  	DeviceNet1
 GenTubeSts        	Normal        	Warning
@@ -46,9 +46,22 @@ eMacSts           	NoError       	Error
 ePulseSync        	Single        	SyncActive
 eMatIntlk         	IntlkOff      	IntlkOn
 eArcMode          	Gradient      	Level
-RF_Remote         	Rem_Off       	Rem_ON
+RF_Remote         	Rem_Off_0       	Rem_ON_1
 eMatMode          	Auto	      	Manual
 eMatMove		 	None		  	Move
+
+//KLP_EDIT
+//RFPT_RF전용
+GenCtrlMode			UserIO_PLC_0		OnlyRS232_1		OnlyEthernet_2	OnlyDnet_3		RS232_PLC_4		Ethernet_PLC_5		Dnet_PLC_6
+GenArcMode			Disable_0			Enable_1
+GenPulseMS			PulseMaster_0		PulseSlave_1
+GenPowerMode		Forward_0			Load_1
+GenRampMode			Normal_0			Ramp_1
+GenPulseMode		CW_0				Pulse_1
+RFPTMatMode			Normal_0			Auto_1			Preset_2
+GenNibleRegMode		Forward_0			Load_1			External_2		VA_Limit_3
+GenNibleRampMode	Disable_0			watt_1			ms_Time_2
+
 
 //APC 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -133,11 +146,17 @@ eTRAPCommSts      OFFLINE       ONLINE
 //EPD 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-eEPDConnect				None	Connect	 	Reconnect  	Disconnect
-eEPDCMD_MSG				None	RESET	 	TEST	 	PRESENT    	VERSION    CFGLIST    WAFERINFO    START    STOP    PAUSE    CONTINUE    COMPLETE
-eEPDStatus				None	OK			FAIL
-eEPDCOM_STS				None	Online  	Offline  	Offline_HW
-eEPDEVE_MSG				None	End_Point  	Local    	Remote    	Running    Ready    NotReady    UserEve	Matrix    DataBlock    Error    PowerUp    Err_Ack    Use_Err
+//eEPDConnect				None	Connect	 	Reconnect  	Disconnect
+//eEPDCMD_MSG				None	RESET	 	TEST	 	PRESENT    	VERSION    CFGLIST    WAFERINFO    START    STOP    PAUSE    CONTINUE    COMPLETE
+//eEPDStatus				None	OK			FAIL
+//eEPDCOM_STS				None	Online  	Offline  	Offline_HW
+//eEPDEVE_MSG				None	End_Point  	Local    	Remote    	Running    Ready    NotReady    UserEve	Matrix    DataBlock    Error    PowerUp    Err_Ack    Use_Err
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+eEPDCommSts       OFFLINE       ONLINE
+eEPDCmd           None          Reset        Start        Stop         RcpInfo      RcpNo
+eEPDError         None  				E000   E001   E002  E003  E004   E005  E006   E007  E008   E009   E010	E011
+eEPDSts           UNKNOWN       STOPPED      STARTED      DETECTED     NOT_DETECT      
 
 //ESC 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++                                                                                      

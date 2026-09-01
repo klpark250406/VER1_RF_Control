@@ -35,6 +35,7 @@ enum {eInterface, eDeviceNet};
 // KLP_EDIT
 // RFPT Control
 enum {eMATCH_MANUAL_0, eMATCH_AUTO_1, eMATCH_PRESET_2};
+enum {UserIO_PLC_0,	OnlyRS232_1,	OnlyEthernet_2,	OnlyDnet_3,	RS232_PLC_4,	Ethernet_PLC_5,	Dnet_PLC_6};
 
 
 
@@ -42,7 +43,7 @@ enum {eMATCH_MANUAL_0, eMATCH_AUTO_1, eMATCH_PRESET_2};
 
 BOOL SIMULATION_MODE = FALSE;
 #define SRF									0
-#define BRF									50
+#define BRF									1
 
 int		gnPR_RF_Ctrl;
 int     gnAlarmOffset = 0;
@@ -127,6 +128,9 @@ BEGIN_OBJECT_ENUMERATION
 	CAIO        AI_RFG_FwdPwr_Set		    (_TEXT("eAI_$0_FwdPwr_Set"		));	// RFPT Generator Set Point Power readback 채널
 	CAIO        AI_RFG_RFFreqIn			    (_TEXT("eAI_$0_RFFreqIn"		));	// RFPT Generator RF Frequency readback 채널
 
+	CAIO        AI_RFG_ControlModeRb       (_TEXT("eAI_$0_ControlModeRb"   ));	// RFPT Generator byte54 Control Mode readback
+	
+
 
 
                                         
@@ -138,6 +142,7 @@ BEGIN_OBJECT_ENUMERATION
 
 	//KLP_EDIT
 	CAIO        eAO_RFG_RFFreqOut		    (_TEXT("eAO_$0_RFFreqOut"		));	// RFPT Generator RF Frequency 출력 채널
+	CAIO        eAO_RFG_ControlMode        (_TEXT("eAO_$0_ControlMode"     ));	// RFPT Generator byte41 Control Mode write
 
                                         
 	CDIO        eDI_RFG_GenRemoteMode		(_TEXT("eDI_$0_GenRemoteMode"	));
@@ -285,6 +290,36 @@ SEQ_STATUS INIT()
 	DO_RFG_EXTERNAL_INK_OK.Write(RF_Ready, nCS);					// 외부 Interlock OK 신호를 Ready 상태로 출력한다.
 	Make_Log("[RFSUB_RUN]", "%s RF_ExtIntlk Set On(=Ready)  \n ", RFType);	// 외부 Interlock Ready 로그를 남긴다.
 	_sleep(500);													// 장치가 상태를 안정적으로 반영할 시간을 준다.
+	
+
+	// -------------------------------------------------------------------------
+	// RFPT Generator Control Mode(byte41) = 3(DeviceNet) 설정
+	// 주의:
+	// 1. byte41 Control Mode 와 byte4 bit3 Remote Out 은 서로 다른 항목이다.
+	// 2. Control Mode 는 RF OFF 상태에서만 변경 가능하다.
+	// 3. 현재 code의 eDO_RFG_CtrlMode 는 이름은 CtrlMode 이지만 실제로는 Remote Out(bit3) 채널이다.
+	// -------------------------------------------------------------------------
+	if(DI_RFG_POWER_ON.Read(nCS) == eON_STATUS)
+	{
+		Make_Log("[RFSUB_RUN]", "%s INIT() ABORT. RF is ON. Control Mode(byte41) can be changed only when RF OFF \n ", RFType);
+		return SEQ_ABORT;
+	}
+	
+	eAO_RFG_ControlMode.Write(OnlyDnet_3, nCS);		// RFPT Gen byte41 = 3(DeviceNet)
+	Make_Log("[RFSUB_RUN]", "%s Control Mode Set DeviceNet(3) \n ", RFType);
+	_sleep(500);
+	
+	if((int)AI_RFG_ControlModeRb.Read(nCS) != 3)
+	{
+		sprintf(szAlarm, "%s INIT() ABORT. Control Mode readback is not 3. ControlModeRb=%.0f",
+			RFType,
+			AI_RFG_ControlModeRb.Read(nCS));
+		
+		Make_Log("[RFSUB_RUN]", "%s \n ", szAlarm);
+		return SEQ_ABORT;
+	}	
+
+
 	
 	eDO_RFG_CtrlMode.Write(eRemote, nCS);							// RFPT Generator Remote Out을 ON으로 설정한다.
 	Make_Log("[RFSUB_RUN]", "%s RF Generator Remote Out Set ON \n ", RFType);	// Generator Remote Out ON 로그를 남긴다.

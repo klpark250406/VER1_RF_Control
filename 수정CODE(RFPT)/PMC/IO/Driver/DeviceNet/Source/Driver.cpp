@@ -58,7 +58,7 @@ static	int			iComState  = 0;
 static	int			logFileState;
 static	int			logEnable = 1;
 
-const WriteMask[] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
+const BYTE WriteMask[] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
 static  char		gcInterfaceName[256];
 
 // DeviceNet Card(SST) Status
@@ -134,6 +134,17 @@ union DATA4
 	int iData;
 	unsigned char ucData[4];
 };
+
+//KLP_EDIT
+// [DATA4_U]: RFPT Generator의 Pulse Frequency(4byte uint32 LE) 처리를 위한 union
+// 매개변수: 없음
+// 반환값: 없음
+union DATA4_U
+{
+	DWORD			dwData;		// 4byte unsigned 정수 값 저장용
+	unsigned char	ucData[4];	// 각 바이트를 직접 다루기 위한 배열
+};
+
 
 union union_FRC
 {
@@ -221,6 +232,16 @@ int gnGenAlm_BotIntlk[2]    = {0};    // bit12 : Bottom Interlock
 int gnGenAlm_RFIntlk[2]     = {0};    // bit13 : RF Interlock
 int gnGenAlm_UserIntlk[2]   = {0};    // bit14 : User Interlock
 int gnGenAlm_UnderFWD[2]    = {0};    // bit15 : Under FWD Power
+
+
+// RFPT Generator readback 추가 변수
+int gnGenFreqTuningOnOffRb[2] = {0};	// RFPT Input byte34 bit0 : Freq Tuning On/Off readback
+int gnGenTuningModeRb1[2]     = {0};	// RFPT Input byte34 bit1 : Tuning Mode bit1 readback
+int gnGenTuningModeRb2[2]     = {0};	// RFPT Input byte34 bit2 : Tuning Mode bit2 readback
+int gnGenRetuningModeRb[2]    = {0};	// RFPT Input byte34 bit3 : Retuning Mode readback
+int gnGenControlModeRb[2]     = {0};	// RFPT Input byte54      : Control Mode readback
+int gnGenArcDetectUSERb[2]     = {0};	// RFPT Input byte55      : Acr Detect Use readback
+
 // RFPT Generator Read END =================================================
 //==========================================================================
 
@@ -957,8 +978,8 @@ BOOL OnKillDevice( void* pDrvData , int ID1 , int ID2 , int ID3 , int ID4 , int 
 	
 	_sleep(100);
 	
-	InOutMap[9].pWriteData[0]  = 0;	// Rf : Off, Filament : Off, DNetActive : Off
-	InOutMap[10].pWriteData[0] = 0;	// Rf : Off, Filament : Off, DNetActive : Off
+	InOutMap[15].pWriteData[0]  = 0;	// Rf : Off, Filament : Off, DNetActive : Off
+	InOutMap[16].pWriteData[0] = 0;	// Rf : Off, Filament : Off, DNetActive : Off
 	DNS_WriteDeviceIo( CardHandle, DeviceConfig[9].MacId,  DNS_OUTPUT1, InOutMap[9].pWriteData,  DeviceConfig[9].Output1Size  ); _sleep(50);
 	DNS_WriteDeviceIo( CardHandle, DeviceConfig[10].MacId, DNS_OUTPUT1, InOutMap[10].pWriteData, DeviceConfig[10].Output1Size ); _sleep(50);
 	
@@ -1025,8 +1046,7 @@ int OnReadDigital( void* pDrvData , void* , int ID1, int ID2, int ID3, int ID4, 
 	int  nData = 0;
 	int nIndex = 0;
 
-	// Instance 106 : 30bytes
-
+	
 	if(ID2 == 99)
 	{
 		*Result = TRUE;
@@ -1099,52 +1119,64 @@ int OnReadDigital( void* pDrvData , void* , int ID1, int ID2, int ID3, int ID4, 
 		else if (ID2 == 23 && ID3 == 1)	nData = gnGenPulseMSRb[nIndex];
 		
 		// ------------------------------------------------------------------
-		// byte28 LED Status 비트 - : RFPT Gen 사양서 챕터5 byte28
+		// byte30 : LED Status 비트 - : RFPT Gen 사양서 챕터5 
 		// ------------------------------------------------------------------
-		else if	(ID2 == 28 && ID3 == 0)	nData = gnGenACOn[nIndex];
-		else if	(ID2 == 28 && ID3 == 1)	nData = gnGenInterlockSts[nIndex];
-		else if	(ID2 == 28 && ID3 == 2)	nData = gnGenAlarmSts[nIndex];
-		else if	(ID2 == 28 && ID3 == 3)	nData = gnGenOverTempSts[nIndex];
-		else if	(ID2 == 28 && ID3 == 4)	nData = gnGenPwrLimitSts[nIndex];
-		else if	(ID2 == 28 && ID3 == 5)	nData = gnGenRFOnSts[nIndex];
-		else if	(ID2 == 28 && ID3 == 6)	nData = gnGenRemoteIn[nIndex];
-		
-		
+		else if	(ID2 == 30 && ID3 == 0)	nData = gnGenACOn[nIndex];
+		else if	(ID2 == 30 && ID3 == 1)	nData = gnGenInterlockSts[nIndex];
+		else if	(ID2 == 30 && ID3 == 2)	nData = gnGenAlarmSts[nIndex];
+		else if	(ID2 == 30 && ID3 == 3)	nData = gnGenOverTempSts[nIndex];
+		else if	(ID2 == 30 && ID3 == 4)	nData = gnGenPwrLimitSts[nIndex];
+		else if	(ID2 == 30 && ID3 == 5)	nData = gnGenRFOnSts[nIndex];
+		else if	(ID2 == 30 && ID3 == 6)	nData = gnGenRemoteIn[nIndex];
+			
 		// ------------------------------------------------------------------
-		// byte29 System State 비트 : RFPT Gen 사양서 챕터5 byte29
+		// byte31 : System State
 		// ------------------------------------------------------------------
-		else if	(ID2 == 29 && ID3 == 0)	nData = gnGenSysPwrMode[nIndex];
-		else if	(ID2 == 29 && ID3 == 1)	nData = gnGenSysRampMode[nIndex];
-		else if	(ID2 == 29 && ID3 == 2)	nData = gnGenSysPulseMode[nIndex];
-		else if	(ID2 == 29 && ID3 == 3)	nData = gnGenSysCEXMode[nIndex];
-		else if	(ID2 == 29 && ID3 == 4)	nData = gnGenSysCEXLock[nIndex];
-		else if	(ID2 == 29 && ID3 == 5)	nData = gnGenSysFreqTuning[nIndex];
-		else if	(ID2 == 29 && ID3 == 6)	nData = gnGenSysTuningOnOff[nIndex];
-		else if	(ID2 == 29 && ID3 == 7)	nData = gnGenSysDCBias[nIndex];
-		
-		// ------------------------------------------------------------------
-		// byte30 Alarm 하위 바이트 (bit0~7) : RFPT Gen 사양서 챕터9
-		// ------------------------------------------------------------------
-		else if	(ID2 == 30 && ID3 == 0)	nData = gnGenAlm_AUX3V3[nIndex];
-		else if	(ID2 == 30 && ID3 == 1)	nData = gnGenAlm_AUX5V[nIndex];
-		else if	(ID2 == 30 && ID3 == 2)	nData = gnGenAlm_AUX24V[nIndex];
-		else if	(ID2 == 30 && ID3 == 3)	nData = gnGenAlm_ACL12[nIndex];
-		else if	(ID2 == 30 && ID3 == 4)	nData = gnGenAlm_ACL23[nIndex];
-		else if	(ID2 == 30 && ID3 == 5)	nData = gnGenAlm_ACL31[nIndex];
-		else if	(ID2 == 30 && ID3 == 6)	nData = gnGenAlm_PFC[nIndex];
-		else if	(ID2 == 30 && ID3 == 7)	nData = gnGenAlm_MaxPwr[nIndex];
+		else if	(ID2 == 31 && ID3 == 0)	nData = gnGenSysPwrMode[nIndex];
+		else if	(ID2 == 31 && ID3 == 1)	nData = gnGenSysRampMode[nIndex];
+		else if	(ID2 == 31 && ID3 == 2)	nData = gnGenSysPulseMode[nIndex];
+		else if	(ID2 == 31 && ID3 == 3)	nData = gnGenSysCEXMode[nIndex];
+		else if	(ID2 == 31 && ID3 == 4)	nData = gnGenSysCEXLock[nIndex];
+		else if	(ID2 == 31 && ID3 == 5)	nData = gnGenSysFreqTuning[nIndex];
+		else if	(ID2 == 31 && ID3 == 6)	nData = gnGenSysTuningOnOff[nIndex];
+		else if	(ID2 == 31 && ID3 == 7)	nData = gnGenSysDCBias[nIndex];
 		
 		// ------------------------------------------------------------------
-		// byte31 Alarm 상위 바이트 (bit8~15) : RFPT Gen 사양서 챕터9
+		// byte32 : Alarm Low byte
 		// ------------------------------------------------------------------
-		else if	(ID2 == 31 && ID3 == 0)	nData = gnGenAlm_GateDrv[nIndex];
-		else if	(ID2 == 31 && ID3 == 1)	nData = gnGenAlm_Fan[nIndex];
-		else if	(ID2 == 31 && ID3 == 2)	nData = gnGenAlm_OverTemp[nIndex];
-		else if	(ID2 == 31 && ID3 == 3)	nData = gnGenAlm_TopIntlk[nIndex];
-		else if	(ID2 == 31 && ID3 == 4)	nData = gnGenAlm_BotIntlk[nIndex];
-		else if	(ID2 == 31 && ID3 == 5)	nData = gnGenAlm_RFIntlk[nIndex];
-		else if	(ID2 == 31 && ID3 == 6)	nData = gnGenAlm_UserIntlk[nIndex];
-		else if	(ID2 == 31 && ID3 == 7)	nData = gnGenAlm_UnderFWD[nIndex];
+		else if	(ID2 == 32 && ID3 == 0)	nData = gnGenAlm_AUX3V3[nIndex];
+		else if	(ID2 == 32 && ID3 == 1)	nData = gnGenAlm_AUX5V[nIndex];
+		else if	(ID2 == 32 && ID3 == 2)	nData = gnGenAlm_AUX24V[nIndex];
+		else if	(ID2 == 32 && ID3 == 3)	nData = gnGenAlm_ACL12[nIndex];
+		else if	(ID2 == 32 && ID3 == 4)	nData = gnGenAlm_ACL23[nIndex];
+		else if	(ID2 == 32 && ID3 == 5)	nData = gnGenAlm_ACL31[nIndex];
+		else if	(ID2 == 32 && ID3 == 6)	nData = gnGenAlm_PFC[nIndex];
+		else if	(ID2 == 32 && ID3 == 7)	nData = gnGenAlm_MaxPwr[nIndex];
+		
+		// ------------------------------------------------------------------
+		// byte33 : Alarm High byte
+		// ------------------------------------------------------------------
+		else if	(ID2 == 33 && ID3 == 0)	nData = gnGenAlm_GateDrv[nIndex];
+		else if	(ID2 == 33 && ID3 == 1)	nData = gnGenAlm_Fan[nIndex];
+		else if	(ID2 == 33 && ID3 == 2)	nData = gnGenAlm_OverTemp[nIndex];
+		else if	(ID2 == 33 && ID3 == 3)	nData = gnGenAlm_TopIntlk[nIndex];
+		else if	(ID2 == 33 && ID3 == 4)	nData = gnGenAlm_BotIntlk[nIndex];
+		else if	(ID2 == 33 && ID3 == 5)	nData = gnGenAlm_RFIntlk[nIndex];
+		else if	(ID2 == 33 && ID3 == 6)	nData = gnGenAlm_UserIntlk[nIndex];
+		else if	(ID2 == 33 && ID3 == 7)	nData = gnGenAlm_UnderFWD[nIndex];
+
+		// ------------------------------------------------------------------
+		// byte34 : Tuning Control rb
+		// ------------------------------------------------------------------
+		else if	(ID2 == 34 && ID3 == 0)	nData = gnGenFreqTuningOnOffRb[nIndex];
+		else if	(ID2 == 34 && ID3 == 1)	nData = gnGenTuningModeRb1[nIndex];
+		else if	(ID2 == 34 && ID3 == 2)	nData = gnGenTuningModeRb2[nIndex];
+		else if	(ID2 == 34 && ID3 == 3)	nData = gnGenRetuningModeRb[nIndex];
+
+		// ------------------------------------------------------------------
+		// byte55 : Arc Detect rb
+		// ------------------------------------------------------------------
+		else if	(ID2 == 55 && ID3 == 0)	nData = gnGenArcDetectUSERb[nIndex];
 
 
 		*Result = TRUE;
@@ -1273,12 +1305,32 @@ void OnWriteDigital( void* pDrvData , void* , int ID1, int ID2, int ID3, int ID4
 	else if(ID1 == KYOSAN_SRFG_ID || ID1 == KYOSAN_BRFG_ID)
 	{
 		// ------------------------------------------------------------------
-		// byte4  : Control 비트필드   : RFPT Gen 챕터5 byte4
-		// byte10 : Pulse Control 비트필드 : RFPT Gen 챕터5 byte10 
-		// byte19 : Tuning Control 비트필드 : RFPT Gen 챕터5 byte19 // 미사용 함으로, 조건문에서 삭제. 
-		// 3가지 바이트 모두 동일한 비트 토글 방식 적용
+		// RFPT Generator 출력 처리
+		//
+		// byte4  : Control 비트필드
+		// byte5  : Mode 바이트(니블 결합)
+		//          - ID3 == 0 : 하위니블 Power Regulation Mode
+		//          - ID3 == 1 : 상위니블 Ramp Mode
+		// byte10 : Pulse Control 비트필드
+		// byte21 : Tuning Control 비트필드
+		//
+		// 사양서 근거:
+		// - Generator Poll Command byte4
+		// - Generator Poll Command byte5
+		// - Generator Poll Command byte10
+		// - Generator Poll Command byte21
 		// ------------------------------------------------------------------
-		if(ID2 == 4 || ID2 == 10 )  
+
+		// ------------------------------------------------------------------
+		// byte4  : Control 비트필드			RFPT Gen 챕터5 byte4
+		// byte10 : Pulse Control 비트필드		RFPT Gen 챕터5 byte10 
+		// byte21 : Tuning Control 비트필드		RFPT Gen 챕터11 byte21
+		// => Byte21의 경우 Reserve영역으로 수정함. 주석처리. 26.08.18 
+		// RFPT Gen 사양서 챕터5 / 챕터11 기준
+		// ------------------------------------------------------------------
+
+		//if( (ID2 == 4) || (ID2 == 10) || (ID2 == 21) )
+		if( (ID2 == 4) || (ID2 == 10) )
 		{
 			if(ID3 >= 0 && ID3 <= 7)
 			{
@@ -1294,6 +1346,50 @@ void OnWriteDigital( void* pDrvData , void* , int ID1, int ID2, int ID3, int ID4
 				}
 			}
 		}
+		// ------------------------------------------------------------------
+		// [2] byte5 는 bitfield가 아니라 nibble 조합 바이트이므로
+		//     하위니블 / 상위니블을 따로 바꿔서 다시 합쳐야 한다.
+		// ------------------------------------------------------------------
+		else if(ID2 == 5)
+		{
+			// 현재 output buffer의 byte5 기존 값을 읽는다.
+			// 이유:
+			// RegMode만 바꿀 때 RampMode를 유지해야 하고,
+			// RampMode만 바꿀 때 RegMode를 유지해야 하기 때문이다.
+			Temp = InOutMap[iWriteIndex].pWriteData[ID2];
+			
+			// --------------------------------------------------------------
+			// ID3 == 0 이면 하위니블 Power Regulation Mode 제어
+			// RFPT 사양서:
+			// 0=Forward, 1=Load, 2=External, 3=VA Limit
+			// --------------------------------------------------------------
+			if(ID3 == 0)
+			{
+				// 허용 범위를 벗어나면 사양서 범위 안으로 보정한다.
+				if(SetValue < 0)			SetValue = 0;
+				else if(SetValue > 3)		SetValue = 3;
+				
+				// 상위니블(bit4~7)은 유지하고,
+				// 하위니블(bit0~3)만 새 값으로 바꾼다.
+				Temp = (Temp & 0xF0) | ((BYTE)SetValue & 0x0F);
+			}
+			// --------------------------------------------------------------
+			// ID3 == 1 이면 상위니블 Ramp Mode 제어
+			// RFPT 사양서:
+			// 0=Disable, 1=Watts/s, 2=Timed(ms)
+			// --------------------------------------------------------------
+			else if(ID3 == 1)
+			{
+				// 허용 범위를 벗어나면 사양서 범위 안으로 보정한다.
+				if(SetValue < 0)			SetValue = 0;
+				else if(SetValue > 2)		SetValue = 2;
+				
+				// 하위니블(bit0~3)은 유지하고,
+				// 상위니블(bit4~7)만 새 값으로 바꾼다.
+				Temp = (Temp & 0x0F) | ((((BYTE)SetValue) & 0x0F) << 4);
+			}
+		}
+
 	}
 	
 	else if(ID1 == KYOSAN_SMAT_ID || ID1 == KYOSAN_BMAT_ID)
@@ -1414,22 +1510,18 @@ double OnReadAnalog( void* pDrvData , void* , int ID1, int ID2, int ID3, int ID4
 		if (ID1 == KYOSAN_SRFG_ID) nIndex = 0;
 		else					   nIndex = 1;
 		
-		if		(ID2 == 0)	dData = gdblDeliveredPwr[nIndex];	// byte0~1 : Set Point Power readback : RFPT Gen 챕터11 Input offset 0~1
-		else if	(ID2 == 2)	dData = gdblRFFreqIn[nIndex];		// byte2~3 : RF Frequency In readback : RFPT Gen 챕터11 Input offset 2~3
-		else if	(ID2 == 4)	dData = gdblFwdPwr[nIndex];			// byte4~5 : Forward Power In -: RFPT Gen 챕터11 Input offset 4~5
-		else if	(ID2 == 6)	dData = gdblRefPwr[nIndex];			// byte6~7 : Reflected Power In -: RFPT Gen 챕터11 Input offset 6~7
-		else if	(ID2 == 8)	dData = gdblDeliveryPwr[nIndex];	// byte8~9 : Delivery Power In : RFPT Gen 챕터11 Input offset 8~9
-		// ------------------------------------------------------------------
-		// byte18 : Mode readback (nibble) 
-		// RFPT Gen 사양서 챕터11 Input offset 18
-		// 1byte 직접 반환 (nibble: 하위4bit=RegMode/상위4bit=RampMode)
-		// ------------------------------------------------------------------
-		else if	(ID2 == 18)	dData = (double)InOutMap[ID1].pReadData[18];  // byte18
-		else if	(ID2 == 19)	dData = gdbRampUpTime[nIndex];		// byte19~20 : Ramp Up Time rb : RFPT Gen 챕터11 Input offset 19~20
-		else if	(ID2 == 21)	dData = gdbRampDownTime[nIndex];	// byte21~22 : Ramp Down Time rb : RFPT Gen 챕터11 Input offset 21~22
-		else if	(ID2 == 24)	dData = gdblPulseFreqRb[nIndex];	// byte24~25 : Pulse Frequency rb : RFPT Gen 챕터11 Input offset 24~25
-		else if	(ID2 == 26)	dData = gdblPulseDutyRb[nIndex];	// byte26~27 : Pulse Duty rb : RFPT Gen 챕터11 Input offset 26~27
-		
+		if		(ID2 == 0)	dData = gdblDeliveredPwr[nIndex];		// byte0~1  : Set Point Power rb
+		else if	(ID2 == 2)	dData = gdblRFFreqIn[nIndex];			// byte2~3  : RF Frequency In rb
+		else if	(ID2 == 4)	dData = gdblFwdPwr[nIndex];				// byte4~5  : Forward Power In
+		else if	(ID2 == 6)	dData = gdblRefPwr[nIndex];				// byte6~7  : Reflected Power In
+		else if	(ID2 == 8)	dData = gdblDeliveryPwr[nIndex];		// byte8~9  : Delivery Power In
+		else if	(ID2 == 18)	dData = (double)InOutMap[ID1].pReadData[18];	// byte18   : Mode rb(raw byte)
+		else if	(ID2 == 19)	dData = gdbRampUpTime[nIndex];			// byte19~20: Ramp Up rb
+		else if	(ID2 == 21)	dData = gdbRampDownTime[nIndex];		// byte21~22: Ramp Down rb
+		else if	(ID2 == 24)	dData = gdblPulseFreqRb[nIndex];		// byte24~27: Pulse Frequency rb (4byte)
+		else if	(ID2 == 28)	dData = gdblPulseDutyRb[nIndex];		// byte28~29: Pulse Duty rb
+		else if (ID2 == 54)	dData = (double)gnGenControlModeRb[nIndex];	// byte54   : Control Mode rb
+	
 		*Result = TRUE;
 	}
 
@@ -1501,7 +1593,6 @@ double OnReadAnalog( void* pDrvData , void* , int ID1, int ID2, int ID3, int ID4
 
 void OnWriteAnalog( void* pDrvData , void* , int ID1, int ID2, int ID3, int ID4, double SetValue , int* Result ) 
 {
-	// 	TAutoCriticalSection Lock(csLock);
 	int			HighByte = 0;
 	int			LowByte = 0;
 	int			Data = 0;
@@ -1514,9 +1605,10 @@ void OnWriteAnalog( void* pDrvData , void* , int ID1, int ID2, int ID3, int ID4,
 	BYTE		mask[8] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
 
 	union DATA	 uTempValue;
-	union uValue sData;					// 2018.03.01
-	float fSetRatio;					// 2018.03.01
+	//union uValue sData;					// 2018.03.01
+	//float fSetRatio;					// 2018.03.01
 	union uValue  uTempfValue4;			// 2026.06.20
+
 
 	if(ID1 == KYOSAN_SRFG_ID || ID1 == KYOSAN_BRFG_ID)
 	{
@@ -1573,24 +1665,51 @@ void OnWriteAnalog( void* pDrvData , void* , int ID1, int ID2, int ID3, int ID4,
 		if(ID1 == KYOSAN_SRFG_ID || ID1 == KYOSAN_BRFG_ID)
 		{
 			// ------------------------------------------------------------------
-			// RFPT Gen 출력은 byte5(Mode nibble) 제외 모두 2byte uint16 LE 방식
-			// RFPT Gen 사양서 챕터11 Output Map - 모든 바이트값 uint16 LE
+			// RFPT Generator는 byte5, byte41 은 1byte 직접값이고,
+			// byte11~14 Pulse Frequency는 4byte uint32 LE 이며,
+			// 그 외 현재 사용범위의 바이트 값은 2byte LE 로 처리한다.
 			// ------------------------------------------------------------------
-			if(ID2 == 5)
+			if(ID2 == 5 || ID2 == 41)
 			{
+				// byte5  : Mode 1byte
 				// Mode nibble byte - 1byte 직접 set
 				// RFPT Gen 사양서 챕터11 Output offset 5, nibble byte
 				// 하위4bit=RegMode(0~3), 상위4bit=RampMode(0~2)
-				InOutMap[iWriteIndex].pWriteData[iWritePoint] = (int)SetValue;
+				// byte41 : Control Mode 1byte
+				InOutMap[iWriteIndex].pWriteData[iWritePoint] = (BYTE)((int)SetValue & 0xFF);
 			}
+
+			// ------------------------------------------------------------------
+			// byte11~14 : Pulse Frequency
+			// RFPT Gen 사양서 챕터5 Master->Slave Poll Command
+			// uint32 LE 4byte 처리
+			// ------------------------------------------------------------------
+			else if(ID2 == 11)
+			{
+				union DATA4_U uTempValue4;
+				
+				if(SetValue < 0)	uTempValue4.dwData = 0;
+				else				uTempValue4.dwData = (DWORD)(SetValue);
+				
+				InOutMap[iWriteIndex].pWriteData[iWritePoint + 0] = uTempValue4.ucData[0];
+				InOutMap[iWriteIndex].pWriteData[iWritePoint + 1] = uTempValue4.ucData[1];
+				InOutMap[iWriteIndex].pWriteData[iWritePoint + 2] = uTempValue4.ucData[2];
+				InOutMap[iWriteIndex].pWriteData[iWritePoint + 3] = uTempValue4.ucData[3];
+			}
+			
+			// ------------------------------------------------------------------
+			// 나머지 현재 사용범위의 다바이트 출력은 2byte LE
+			// ------------------------------------------------------------------
 			else
 			{
-				// 나머지 모든 AO 항목 : 2byte uint16 LE 처리
+
 				// RFPT Gen 사양서 챕터11 Output Map - uint16 LE
-				uTempValue.iData = (int)SetValue;
+				//uTempValue.iData = (int)SetValue;
+				uTempValue.iData = (short)((int)SetValue);
 				InOutMap[iWriteIndex].pWriteData[iWritePoint + 0] = uTempValue.ucData[0];
 				InOutMap[iWriteIndex].pWriteData[iWritePoint + 1] = uTempValue.ucData[1];
 			}
+
 		}
 
 		else if(ID1 == KYOSAN_SMAT_ID || ID1 == KYOSAN_BMAT_ID)
@@ -1700,7 +1819,8 @@ int READ_KYOSAN_RFGEN(int MacId)
 	int  iReadPoint;
 	int  nIndex;
 
-	union DATA uTempValu2;                    //  (2Byte 조합용)
+	union DATA    uTempValu2;	// 2byte LE 조합용
+	union DATA4_U uTempValu4;	// 4byte LE 조합용
 
 	iReadIndex = MacId;
 	if      (MacId == KYOSAN_SRFG_ID) nIndex = 0;
@@ -1804,28 +1924,28 @@ int READ_KYOSAN_RFGEN(int MacId)
 	gnGenPulseMSRb[nIndex]    = Get_Bit_Sts(InOutMap[iReadIndex].pReadData[iReadPoint], 1);
 
 	// ------------------------------------------------------------------
-	// byte24~25 : Pulse Frequency (readback)
-	// RFPT Gen 사양서 챕터11 Input offset 24~25, uint16 LE, 1Hz 
+	// byte24~27 : Pulse Frequency rb (4byte uint32 LE)
 	// ------------------------------------------------------------------
 	iReadPoint = 24;
-	uTempValu2.ucData[0] = InOutMap[iReadIndex].pReadData[iReadPoint];
-	uTempValu2.ucData[1] = InOutMap[iReadIndex].pReadData[iReadPoint + 1];
-	gdblPulseFreqRb[nIndex] = uTempValu2.iData;
+	uTempValu4.ucData[0] = InOutMap[iReadIndex].pReadData[iReadPoint + 0];
+	uTempValu4.ucData[1] = InOutMap[iReadIndex].pReadData[iReadPoint + 1];
+	uTempValu4.ucData[2] = InOutMap[iReadIndex].pReadData[iReadPoint + 2];
+	uTempValu4.ucData[3] = InOutMap[iReadIndex].pReadData[iReadPoint + 3];
+	gdblPulseFreqRb[nIndex] = (double)uTempValu4.dwData;
 
 	// ------------------------------------------------------------------
-	// byte26~27 : Pulse Duty (readback)
-	// RFPT Gen 사양서 챕터11 Input offset 26~27, uint16 LE, 0.1% 
+	// byte28~29 : Pulse Duty rb
 	// ------------------------------------------------------------------
-	iReadPoint = 26;
-	uTempValu2.ucData[0] = InOutMap[iReadIndex].pReadData[iReadPoint];
+	iReadPoint = 28;
+	uTempValu2.ucData[0] = InOutMap[iReadIndex].pReadData[iReadPoint + 0];
 	uTempValu2.ucData[1] = InOutMap[iReadIndex].pReadData[iReadPoint + 1];
 	gdblPulseDutyRb[nIndex] = uTempValu2.iData;
 
 	// ------------------------------------------------------------------
-	// byte28 : LED Status 비트필드
-	// RFPT Gen 사양서 챕터5 byte28 LED Status
+	// byte30 : LED Status 비트필드
+	// RFPT Gen 사양서 챕터5 byte30 LED Status
 	// ------------------------------------------------------------------
-	iReadPoint = 28;
+	iReadPoint = 30;
 	gnGenACOn[nIndex]        = Get_Bit_Sts(InOutMap[iReadIndex].pReadData[iReadPoint], 0); // AC On
 	gnGenInterlockSts[nIndex]= Get_Bit_Sts(InOutMap[iReadIndex].pReadData[iReadPoint], 1); // Interlock
 	gnGenAlarmSts[nIndex]    = Get_Bit_Sts(InOutMap[iReadIndex].pReadData[iReadPoint], 2); // Alarm
@@ -1834,12 +1954,12 @@ int READ_KYOSAN_RFGEN(int MacId)
 	gnGenRFOnSts[nIndex]     = Get_Bit_Sts(InOutMap[iReadIndex].pReadData[iReadPoint], 5); // RF On/Off
 	gnGenRemoteIn[nIndex]    = Get_Bit_Sts(InOutMap[iReadIndex].pReadData[iReadPoint], 6); // Remote In off/on
 	
-
+	
 	// ------------------------------------------------------------------
-	// byte29 : System State 비트필드
-	// RFPT Gen 사양서 챕터5 byte29 System State 
+	// byte31 : System State 비트필드
+	// RFPT Gen 사양서 챕터5 byte31 System State 
 	// ------------------------------------------------------------------
-	iReadPoint = 29;
+	iReadPoint = 31;
 	gnGenSysPwrMode[nIndex]    = Get_Bit_Sts(InOutMap[iReadIndex].pReadData[iReadPoint], 0);
 	gnGenSysRampMode[nIndex]   = Get_Bit_Sts(InOutMap[iReadIndex].pReadData[iReadPoint], 1);
 	gnGenSysPulseMode[nIndex]  = Get_Bit_Sts(InOutMap[iReadIndex].pReadData[iReadPoint], 2);
@@ -1850,10 +1970,10 @@ int READ_KYOSAN_RFGEN(int MacId)
 	gnGenSysDCBias[nIndex]     = Get_Bit_Sts(InOutMap[iReadIndex].pReadData[iReadPoint], 7);
 
 	// ------------------------------------------------------------------
-	// byte30 : Alarm 하위 바이트 (bit0~7)
-	// RFPT Gen 사양서 챕터5 byte30~31 Alarm 16bit, LSB=byte30
+	// byte32 : Alarm 하위 바이트 (bit0~7)
+	// RFPT Gen 사양서 챕터5 byte32~33 Alarm 16bit, LSB=byte32
 	// ------------------------------------------------------------------
-	iReadPoint = 30;
+	iReadPoint = 32;
 	gnGenAlm_AUX3V3[nIndex]  = Get_Bit_Sts(InOutMap[iReadIndex].pReadData[iReadPoint], 0);
 	gnGenAlm_AUX5V[nIndex]   = Get_Bit_Sts(InOutMap[iReadIndex].pReadData[iReadPoint], 1);
 	gnGenAlm_AUX24V[nIndex]  = Get_Bit_Sts(InOutMap[iReadIndex].pReadData[iReadPoint], 2);
@@ -1864,10 +1984,10 @@ int READ_KYOSAN_RFGEN(int MacId)
 	gnGenAlm_MaxPwr[nIndex]  = Get_Bit_Sts(InOutMap[iReadIndex].pReadData[iReadPoint], 7);
 
 	// ------------------------------------------------------------------
-	// byte31 : Alarm 상위 바이트 (bit8~15)
-	// RFPT Gen 사양서 챕터5 byte31, 상위 바이트 Alarm 16bit
+	// byte33 : Alarm 상위 바이트 (bit8~15)
+	// RFPT Gen 사양서 챕터5 byte33, 상위 바이트 Alarm 16bit
 	// ------------------------------------------------------------------
-	iReadPoint = 31;
+	iReadPoint = 33;
 	gnGenAlm_GateDrv[nIndex]  = Get_Bit_Sts(InOutMap[iReadIndex].pReadData[iReadPoint], 0); // bit8
 	gnGenAlm_Fan[nIndex]      = Get_Bit_Sts(InOutMap[iReadIndex].pReadData[iReadPoint], 1); // bit9
 	gnGenAlm_OverTemp[nIndex] = Get_Bit_Sts(InOutMap[iReadIndex].pReadData[iReadPoint], 2); // bit10
@@ -1876,6 +1996,28 @@ int READ_KYOSAN_RFGEN(int MacId)
 	gnGenAlm_RFIntlk[nIndex]  = Get_Bit_Sts(InOutMap[iReadIndex].pReadData[iReadPoint], 5); // bit13
 	gnGenAlm_UserIntlk[nIndex]= Get_Bit_Sts(InOutMap[iReadIndex].pReadData[iReadPoint], 6); // bit14
 	gnGenAlm_UnderFWD[nIndex] = Get_Bit_Sts(InOutMap[iReadIndex].pReadData[iReadPoint], 7); // bit15
+
+	// ------------------------------------------------------------------
+	// byte34 : Tuning Control rb
+	// ------------------------------------------------------------------
+	iReadPoint = 34;
+	gnGenFreqTuningOnOffRb[nIndex] = Get_Bit_Sts(InOutMap[iReadIndex].pReadData[iReadPoint], 0);
+	gnGenTuningModeRb1[nIndex]     = Get_Bit_Sts(InOutMap[iReadIndex].pReadData[iReadPoint], 1);
+	gnGenTuningModeRb2[nIndex]     = Get_Bit_Sts(InOutMap[iReadIndex].pReadData[iReadPoint], 2);
+	gnGenRetuningModeRb[nIndex]    = Get_Bit_Sts(InOutMap[iReadIndex].pReadData[iReadPoint], 3);
+
+	// ------------------------------------------------------------------
+	// byte54 : Control Mode rb
+	// ------------------------------------------------------------------
+	iReadPoint = 54;
+	gnGenControlModeRb[nIndex] = InOutMap[iReadIndex].pReadData[iReadPoint];
+
+	// ------------------------------------------------------------------
+	// byte55 : Arc Detect Use rb
+	// ------------------------------------------------------------------
+	iReadPoint = 55;
+	gnGenArcDetectUSERb[nIndex] = Get_Bit_Sts(InOutMap[iReadIndex].pReadData[iReadPoint], 0);
+
 
 	return 1;
 }

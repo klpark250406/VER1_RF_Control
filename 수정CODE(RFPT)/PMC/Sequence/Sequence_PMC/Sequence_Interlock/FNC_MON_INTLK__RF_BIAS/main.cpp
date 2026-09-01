@@ -1111,6 +1111,9 @@ void Fnc_MaxRef_Check(void *pDummy)
 
 			if(CheckKill()) break;
 		
+			//KLP_EDIT
+			// 아래 1개 항목 dActual 추가하는거 횡전개 해야할듯.dd
+			dActual			= BRF_RefPwr_RA.Read(nCs);
 			dHRF_RefValue	= SRF_RefPwr_RA.Read(nCs);
 			dLRF_RefValue	= BRF_RefPwr_RA.Read(nCs);
 			dBiasVdcData	= BRF_Vdc_RA.Read(nCs);

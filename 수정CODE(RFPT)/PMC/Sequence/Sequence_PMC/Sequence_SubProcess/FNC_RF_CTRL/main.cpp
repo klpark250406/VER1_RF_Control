@@ -41,6 +41,15 @@ enum  {eInterface, eDeviceNet};
 //KLP_EDIT
 // RFPT Remote check.
 enum	{REMOTE_OFF_0, REMOTE_ON_1};	// 0 : Remote OFF / 1 :Remote ON
+// -----------------------------------------------------------------------------
+// RFPT Generator Byte5 Mode 전용 enum
+// 사양서 근거:
+// - 하위니블(bit0~3) : Power Regulation Mode
+// - 상위니블(bit4~7) : Ramp Mode
+// -----------------------------------------------------------------------------
+enum	{eMode_Reg_Forward_0, eMode_Reg_Load_1, eMode_Reg_External_2, eMode_Reg_VA_Limit_3};
+enum	{eMode_Ramp_Disable_0, eMode_Ramp_Watt_1, eMode_Ramp_Timed_2};
+
 //----------------------------------------------------------------------------------------------------------------------------------------------
 BEGIN_OBJECT_ENUMERATION
 
@@ -147,6 +156,28 @@ BEGIN_OBJECT_ENUMERATION
 	CDIO			eDO_SRFG_ArcDetect				(_TEXT("eDO_SRFG_ArcDetect"			));
 	CDIO			eDO_BRFG_ArcDetect				(_TEXT("eDO_BRFG_ArcDetect"			));
 	
+	// -----------------------------------------------------------------------------
+	// RFPT Generator Byte5 Mode nibble 분리 제어 채널
+	// - RegMode  : byte5 하위니블(bit0~3)
+	// - RampMode : byte5 상위니블(bit4~7)
+	// -----------------------------------------------------------------------------
+	CDIO			eDO_SRFG_RegMode				(_TEXT("eDO_SRFG_RegMode"			));
+	CDIO			eDO_SRFG_RampMode				(_TEXT("eDO_SRFG_RampMode"			));
+	CDIO			eDO_BRFG_RegMode				(_TEXT("eDO_BRFG_RegMode"			));
+	CDIO			eDO_BRFG_RampMode				(_TEXT("eDO_BRFG_RampMode"			));
+
+	CDIO			cRF_eDO_SRFG_RegMode				(_TEXT("cRF_eDO_SRFG_RegMode"			));
+	CDIO			cRF_eDO_SRFG_RampMode				(_TEXT("cRF_eDO_SRFG_RampMode"			));
+	CDIO			cRF_eDO_BRFG_RegMode				(_TEXT("cRF_eDO_BRFG_RegMode"			));
+	CDIO			cRF_eDO_BRFG_RampMode				(_TEXT("cRF_eDO_BRFG_RampMode"			));
+
+
+	// -----------------------------------------------------------------------------
+	// 기존 raw byte5 직접 write 채널
+	// 현재 FNC_RF_CTRL에서는 더 이상 직접 쓰지 않고,
+	// nibble 분리 제어 채널(eDO_*_RegMode / eDO_*_RampMode)을 사용한다.
+	// 다른 legacy code와 호환을 위해 object 선언은 유지한다.
+	// -----------------------------------------------------------------------------
 	CAIO			eAO_SRF_Mode					(_TEXT("eAO_SRF_Mode"				));
 	CAIO			eAO_BRF_Mode					(_TEXT("eAO_BRF_Mode"				));
 
@@ -317,6 +348,79 @@ void RFOFFRUN_Log(char *SeparateSting, LPSTR list, ...)
 	
 }
 
+// [SET_RF_MODE__SOURCE]: Source RF Generator의 Byte5 Mode를 nibble 단위로 설정한다.
+// 매개변수:
+// nRegMode  = Power Regulation Mode (0=Forward, 1=Load, 2=External, 3=VA Limit)
+// nRampMode = Ramp Mode (0=Disable, 1=Watts/s, 2=Timed(ms))
+// 반환값: 없음
+void SET_RF_MODE__SOURCE(int nRegMode, int nRampMode)
+{
+	int nCS = 0;
+	
+	// -----------------------------------------------------------------
+	// Source Generator Byte5 하위니블(RegMode) 먼저 기록한다.
+	// Driver(DeviceNet.cpp)에서 기존 상위니블은 유지하면서 하위니블만 바꾼다.
+	// -----------------------------------------------------------------
+	eDO_SRFG_RegMode.Write(nRegMode, nCS);
+	
+	// -----------------------------------------------------------------
+	// Source Generator Byte5 상위니블(RampMode) 기록한다.
+	// Driver(DeviceNet.cpp)에서 기존 하위니블은 유지하면서 상위니블만 바꾼다.
+	// -----------------------------------------------------------------
+	eDO_SRFG_RampMode.Write(nRampMode, nCS);
+	
+	Make_Log("[RF_ACTION]", "SET_RF_MODE__SOURCE() Reg=%d Ramp=%d \n", nRegMode, nRampMode);
+}
+
+
+// [SET_RF_MODE__BIAS]: Bias RF Generator의 Byte5 Mode를 nibble 단위로 설정한다.
+// 매개변수:
+// nRegMode  = Power Regulation Mode (0=Forward, 1=Load, 2=External, 3=VA Limit)
+// nRampMode = Ramp Mode (0=Disable, 1=Watts/s, 2=Timed(ms))
+// 반환값: 없음
+void SET_RF_MODE__BIAS(int nRegMode, int nRampMode)
+{
+	int nCS = 0;
+
+	// -----------------------------------------------------------------
+	// Bias Generator Byte5 하위니블(RegMode) 먼저 기록한다.
+	// Driver(DeviceNet.cpp)에서 기존 상위니블은 유지하면서 하위니블만 바꾼다.
+	// -----------------------------------------------------------------
+	eDO_BRFG_RegMode.Write(nRegMode, nCS);
+	
+	// -----------------------------------------------------------------
+	// Bias Generator Byte5 상위니블(RampMode) 기록한다.
+	// Driver(DeviceNet.cpp)에서 기존 하위니블은 유지하면서 상위니블만 바꾼다.
+	// -----------------------------------------------------------------
+	eDO_BRFG_RampMode.Write(nRampMode, nCS);
+	
+	Make_Log("[RF_ACTION]", "SET_RF_MODE__BIAS() Reg=%d Ramp=%d \n", nRegMode, nRampMode);
+}
+
+
+// [SET_RF_MODE__BOTH]: Source/Bias Generator의 Byte5 Mode를 동일 조합으로 한 번에 설정한다.
+// 매개변수:
+// nRegMode  = Power Regulation Mode
+// nRampMode = Ramp Mode
+// 반환값: 없음
+void SET_RF_MODE__BOTH(int nRegMode, int nRampMode)
+{
+	// -----------------------------------------------------------------
+	// Source 쪽 Byte5 Mode를 먼저 설정한다.
+	// -----------------------------------------------------------------
+	SET_RF_MODE__SOURCE(nRegMode, nRampMode);
+	
+	// -----------------------------------------------------------------
+	// Bias 쪽 Byte5 Mode를 동일하게 설정한다.
+	// -----------------------------------------------------------------
+	SET_RF_MODE__BIAS(nRegMode, nRampMode);
+	
+	Make_Log("[RF_ACTION]", "SET_RF_MODE__BOTH() Reg=%d Ramp=%d \n", nRegMode, nRampMode);
+}
+
+
+
+
 
 SEQ_STATUS RampUpSetTime()
 {
@@ -470,7 +574,11 @@ int CHK_RF_INTLK()
 	Make_Log("[RF_ACTION]", "%s \n",szLog);*/	
 
 	//if(nRFGWFS == eOK && nRFMWFS == eOK && nRFGWLS == eOK && nRFCover == eOK && nProcGas == eOK && nExterIntlk ==eOK)	
-	if(nRFGWFS == eOK && nRFMWFS == eOK && nRFGWLS == eOK && nRFCover == eOK && nProcGas == eOK )	
+	
+	//KLP_EDIT
+	// nRFMWLS 도 interlock Check에 포함되도록 추가.
+	// 이 항목도 횡전개 진행해야 할듯. 
+	if(nRFGWFS == eOK && nRFMWFS == eOK && nRFGWLS == eOK && nRFCover == eOK && nProcGas == eOK && nRFMWLS )	
 	{
 		nRF_INTLK_STS = 1;
 		sprintf(szLog, "All Check_OK : %d",nRF_INTLK_STS);
@@ -943,7 +1051,7 @@ SEQ_STATUS MNT_RF_ON()
 		
 		while(TRUE) 
 		{
-			if( FNC_SRF.Status() != SEQ_RUNNING || FNC_BRF.Status() != SEQ_RUNNING )	break;
+			if( FNC_SRF.Status() != SEQ_RUNNING && FNC_BRF.Status() != SEQ_RUNNING )	break;
 			if(WaitAbort(10))	return SEQ_ABORT;
 		}
 
@@ -975,7 +1083,7 @@ SEQ_STATUS MNT_RF_ON()
 		
 		while(TRUE) 
 		{
-			if( FNC_SRF.Status() != SEQ_RUNNING || FNC_BRF.Status() != SEQ_RUNNING )	break;
+			if( FNC_SRF.Status() != SEQ_RUNNING && FNC_BRF.Status() != SEQ_RUNNING )	break;
 			if(WaitAbort(10))	return SEQ_ABORT;
 		}
 		
@@ -1118,7 +1226,9 @@ SEQ_STATUS MNT_RF_ON()
 			
 			return SEQ_ABORT;
 		}
-		else if(SResult == SEQ_ERROR || BResult == SEQ_ABORT)
+		//KLP_EDIT
+		// 위에꺼랑 동일한 조건이여서 의미없음. 횡전개 해야하는 항목일듯. 
+		else if(SResult == SEQ_ABORT || BResult == SEQ_ERROR)
 		{
 			if(DI_BIAS_RFG_POWER_ON.Read(nCS) == ON)
 			{
@@ -1193,7 +1303,7 @@ SEQ_STATUS MNT_RF_OFF()
 
 	while(TRUE) 
 	{
-		if(FNC_SRF.Status() != SEQ_RUNNING || FNC_BRF.Status() != SEQ_RUNNING  )	break;
+		if(FNC_SRF.Status() != SEQ_RUNNING && FNC_BRF.Status() != SEQ_RUNNING  )	break;
 		if(WaitAbort(10))	return SEQ_ABORT;
 	}
 
@@ -1255,7 +1365,7 @@ SEQ_STATUS MNT_RF_INIT()
 
 	while(TRUE) 
 	{
-		if( FNC_SRF.Status() != SEQ_RUNNING || FNC_BRF.Status() != SEQ_RUNNING  )	break;
+		if( FNC_SRF.Status() != SEQ_RUNNING && FNC_BRF.Status() != SEQ_RUNNING  )	break;
 		if(WaitAbort(10))	return SEQ_ABORT;
 	}
 
@@ -1585,8 +1695,10 @@ void Mon_ACTION_SCREENLOCK(void *pDummy )
 			RF_ALL_WLS_CHK.Equal(eOK)			&&	
 			RF_ALL_COVER_CHK.Equal(eOK)			&&	
 			RF_PRC_GAS_VLV_CHK.Equal(eOK)		&&		
-			RF_SRF_EXTINTLK_CHK.Equal(eOK)		&&		
-			RF_BRF_EXTINTLK_CHK.Equal(eOK)		&&	
+			//KLP_EDIT
+			// RFPT는 EXTINTLK 신호를 PLC DI로 받고있지 않음. 
+			//RF_SRF_EXTINTLK_CHK.Equal(eOK)		&&		
+			//RF_BRF_EXTINTLK_CHK.Equal(eOK)		&&	
 			RF_PLCERR_CHK.Equal(eOK)			&&
 		
 			RF_RUN_GATECLOE_CHK.Equal(eOK)		&&	

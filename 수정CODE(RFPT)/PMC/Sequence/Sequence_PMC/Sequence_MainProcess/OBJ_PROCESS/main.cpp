@@ -69,6 +69,8 @@ enum {eSTEPTYPE_NONE, eSTEPTYPE_CHUCK_ST, eSTEPTYPE_CHUCK_ED, eSTEPTYPE_PROCESS,
 enum {eTYPE_PINPOS_2, eTYPE_PINPOS_3, eTYPE_PINPOS_4};
 enum {eTYPE_VVCSET_1, eTYPE_VVCSET_2, eTYPE_VVCSET_3, eTYPE_VVC_NOUSE};
 enum {ePROC_IDLE, ePROC_RUN, ePROC_ABORT};
+enum {eEPD_UNKNOWN, eEPD_STOPPED, eEPD_STARTED, eEPD_DETECTED, eEPD_NOT_DETECTED};
+enum {eEPD_CMD_NONE, eEPD_CMD_RST,eEPD_CMD_START, eEPD_CMD_STOP, eEPD_CMD_RCPINFO, eEPD_CMD_RCPNO };
 enum {LOG_DISABLE, LOG_ENABLE};
 enum {ePROCESS_NORMAL, ePROCESS_AGING, ePROCESS_ONLY_TRANSFER};
 enum {RAMP_DISABLE,RAMP_ENABLE};
@@ -98,9 +100,6 @@ enum {MccEnd,MccStart};
 enum {MccNormalProcess, MccChangeProcess, MccCleaningProcess};
 enum {EQ_Normal,EQ_Fault, EQ_PM};
 enum {Option_NoUse,	Option_Use};
-enum {eEPD_Check_None,eEPD_Check_OK,eEPD_Check_Fail};
-enum {eEPD_Result_None,eEPD_Result_End_Point,eEPD_Result_UserEve =7};
-enum {eEPD_Cmd_None,eEPD_Cmd_Reset,eEPD_Cmd_Present=3, eEPD_Cmd_WaferInfo =6,eEPD_Cmd_Start,eEPD_Cmd_Stop};
 enum {C_Heater_ON,C_Heater_OFF};
 enum {eNG,eOK};
 
@@ -125,6 +124,7 @@ BEGIN_OBJECT_ENUMERATION
 	CAIO 	PR_GAS9							 ( _TEXT( "PR_GAS9"				));
 	CAIO 	PR_GAS10						 ( _TEXT( "PR_GAS10"			));
 
+	CAIO	PR_FRC_MIDDLE					 ( _TEXT( "PR_FRC_MIDDLE"		));		
 	CAIO	PR_FRC_CENTER					 ( _TEXT( "PR_FRC_CENTER"		));		
 
 	CDIO 	PR_APC_CTRL						 ( _TEXT( "PR_APC_CTRL"			));
@@ -145,10 +145,15 @@ BEGIN_OBJECT_ENUMERATION
 	CDIO 	PR_ETCHSTEP						 ( _TEXT( "PR_ETCHSTEP"			));
 	CDIO 	PR_STEPENDTYPE					 ( _TEXT( "PR_STEPENDTYPE"		));
 
-	CSIO 	PR_EPD_RECIPE					 ( _TEXT( "PR_EPD_RECIPE"		));
+	CAIO 	PR_EPD_RECIPENUM				 ( _TEXT( "PR_EPD_RECIPENUM"	));
 	CAIO 	PR_EPD_MIN_TIME					 ( _TEXT( "PR_EPD_MIN_TIME"		));
 
+	CAIO 	PR_EPD_STEPNUM					 ( _TEXT( "PR_EPD_STEPNUM"		));
 	CDIO 	PR_PIN_POS						 ( _TEXT( "PR_PIN_POS"			));
+
+	CDIO 	PR_EPD_ALARM					 ( _TEXT( "PR_EPD_ALARM"		));
+	CDIO 	PR_OVERETCH_TYPE				 ( _TEXT( "PR_OVERETCH_TYPE"	));
+	CAIO 	PR_OVERETCH_VALUE				 ( _TEXT( "PR_OVERETCH_VALUE"	));
 	
 	CAIO 	PR_HE_FLOW_ALARM				 ( _TEXT( "PR_HE_FLOW_ALARM"	));
 	CAIO 	PR_VVC01_POS					 ( _TEXT( "PR_VVC01_POS"		));
@@ -255,24 +260,42 @@ BEGIN_OBJECT_ENUMERATION
 	CAIO 	eAO_TotalEtchTime				 ( _TEXT( "eAO_TotalEtchTime"		));
 	CAIO 	eAO_JustEtchTime				 ( _TEXT( "eAO_JustEtchTime"		));
 
-	CAIO 	EPD_JustEtchTime				 ( _TEXT( "EPD_JustEtchTime"		));
-	CAIO 	EPD_TotalEtchTime				 ( _TEXT( "EPD_TotalEtchTime"		));
+	CDIO 	eDI_EPD_Error					 ( _TEXT( "eDI_EPD_Error"		));
+	CDIO 	eDI_EPD_EndPoint				 ( _TEXT( "eDI_EPD_EndPoint"	));
+	CDIO 	eDO_EPD_Cmd					 	 ( _TEXT( "eDO_EPD_Cmd"			));
 
-	CDIO 	eDO_EPD_Cmd 					 ( _TEXT( "eDO_EPD_Cmd"				));
-	CDIO 	eDI_EPD_COMMAND_ID 				 ( _TEXT( "eDI_EPD_COMMAND_ID"		));	
+	CAIO 	eAI_EPD_JustEtchTime			 ( _TEXT( "eAI_EPD_JustEtchTime"	));
+	CAIO 	eAI_EPD_TotalEtchTime			 ( _TEXT( "eAI_EPD_TotalEtchTime"	));
+	CAIO 	eAI_EPD_OverEtchTime			 ( _TEXT( "eAI_EPD_OverEtchTime"	));
+	CAIO 	eAI_EPD_EndPointStep			 ( _TEXT( "eAI_EPD_EndPointStep"	));
 
-	CSIO 	eSO_EPD_GlassName				 ( _TEXT( "eSO_EPD_GlassName"		));
-	CSIO 	eSO_EPD_RcpName					 ( _TEXT( "eSO_EPD_RcpName"			));
+	CAIO 	eAO_EPD_RecipeNum				 ( _TEXT( "eAO_EPD_RecipeNum"		));
+	CAIO 	eAO_EPD_EQPStepNum				 ( _TEXT( "eAO_EPD_EQPStepNum"		));
+	CAIO 	eAO_EPD_EPDStepNum				 ( _TEXT( "eAO_EPD_EPDStepNum"		));
+
+	CSIO 	eSO_EPD_DevId					 ( _TEXT( "eSO_EPD_DevId"			));
 	CSIO 	eSO_EPD_StepName				 ( _TEXT( "eSO_EPD_StepName"		));
-	CSIO 	eSO_EPD_UseRecipe				 ( _TEXT( "eSO_EPD_UseRecipe"		));
+	CSIO 	eSO_EPD_BatchId				 	 ( _TEXT( "eSO_EPD_BatchId"			));
 
-	CDIO 	eDI_EPD_VTY_START				 ( _TEXT( "eDI_EPD_VTY_START"		));
-	CDIO 	eDI_EPD_EVENT_ID 				 ( _TEXT( "eDI_EPD_EVENT_ID"		));
+	CSIO 	eSI_EPD_DevId					 ( _TEXT( "eSI_EPD_DevId"			));
+	CSIO 	eSI_EPD_StepName				 ( _TEXT( "eSI_EPD_StepName"		));
+	CSIO 	eSI_EPD_BatchId				 	 ( _TEXT( "eSI_EPD_BatchId"			));
+	CSIO 	eSI_EPD_GlassName				 ( _TEXT( "eSI_EPD_GlassName"		));
+	CSIO 	eSI_EPD_RcpName				 	 ( _TEXT( "eSI_EPD_RcpName"			));
+	CSIO 	eSI_EPD_ErrorMsg				 ( _TEXT( "eSI_EPD_ErrorMsg"		));
 
 	CSIO 	PM_ModuleName					 ( _TEXT( "PM_ModuleName"			));
 	CSIO 	GLASS_ID						 ( _TEXT( "GLASS_ID"				));
 	CSIO 	FRONT_GLASS_ID					 ( _TEXT( "FRONT_GLASS_ID"			));
 	CSIO 	REAR_GLASS_ID					 ( _TEXT( "REAR_GLASS_ID"			));
+
+	CSIO 	EQ_BATCH_ID						 ( _TEXT( "EQ_BATCH_ID"				));
+	CSIO 	eSO_EPD_LotID					 ( _TEXT( "eSO_EPD_LotID"			));
+	CSIO 	eSO_EPD_PortID					 ( _TEXT( "eSO_EPD_PortID"			));
+	CSIO 	eSO_EPD_SlotID					 ( _TEXT( "eSO_EPD_SlotID"			));
+	CSIO 	eSO_EPD_GlassName				 ( _TEXT( "eSO_EPD_GlassName"		));
+	CSIO 	eSO_EPD_RcpName					 ( _TEXT( "eSO_EPD_RcpName"			));
+	CSIO 	eSO_EPD_GlassName2				 ( _TEXT( "eSO_EPD_GlassName2"		));
 
 	CSIO 	LOT_ID							 ( _TEXT( "LOT_ID"					));
 	CSIO 	PORT_ID							 ( _TEXT( "PORT_ID"					));
@@ -1096,7 +1119,6 @@ int SetRcpParamToFunParam(int nStepNo)
 	int CS = 0;
 	char szTemp1[256] = {0};
 	char szTemp2[256] = {0};
-	char szEPDRecipe[256] = {0};
 	
 	sprintf(szTemp1, "STEP NUM   = %d",		nStepNo);							Make_Log(szTemp1, "START : RCP PARAMETER TO FUNCTION", EVENT);
 
@@ -1187,9 +1209,12 @@ int SetRcpParamToFunParam(int nStepNo)
 	sprintf(szTemp2, "PR_ESC_VOLT = %.0f", PR_ESC_VOLT.Read(CS));				Make_Log("", szTemp2, EVENT);
 
 
-	PR_EPD_MIN_TIME.Write(RECIPE[nStepNo].EPD_MINTIME	, CS);
-	PR_EPD_RECIPE.Write(RECIPE[nStepNo].EPD_RECIPE	, CS);
-	
+	PR_EPD_RECIPENUM.Write(RECIPE[nStepNo].EPD_RCPNUM		, CS);
+	PR_EPD_MIN_TIME.Write(RECIPE[nStepNo].EPD_MINTIME		, CS);	
+	PR_EPD_STEPNUM.Write(RECIPE[nStepNo].EPD_STEPNUM		, CS);
+	PR_EPD_ALARM.Write(RECIPE[nStepNo].EPD_ALARM			, CS);
+	PR_OVERETCH_TYPE.Write(RECIPE[nStepNo].EPD_OVRETCHTYPE	, CS);
+	PR_OVERETCH_VALUE.Write(RECIPE[nStepNo].EPD_OVRETCHTIME	, CS);
 	sprintf(szTemp1, "STEP NUM   = %d", nStepNo);								Make_Log(szTemp1, "ENDED : RCP PARAMETER TO FUNCTION", EVENT);
 
 	if		(strcmp(RECIPE[nStepNo].APC_CTRL, "NONE") == 0)		PR_APC_CTRL.Write(0 , CS);
@@ -1266,7 +1291,6 @@ SEQ_STATUS RECIPE_READING(const void* pParam, int nNumOfBytesRecved)
 	
 	char    szTemp[512] = {0};
 	TString strStepName;
-	TString strEPDRecipe;
 	
 	TRecipeAnal RCP( (void*)pParam, nNumOfBytesRecved );
 
@@ -1354,7 +1378,10 @@ SEQ_STATUS RECIPE_READING(const void* pParam, int nNumOfBytesRecved)
 			//FRC
 			RECIPE[iii+1].FRC_CENTER= (int)RCP.GetStepItemReal(iii, "PR_FRC_CENTER"	);		
 			sprintf(szTemp, "RECIPE[%d].FRC_CENTER = %d", iii, RECIPE[iii+1].FRC_CENTER);	Make_Log("", szTemp, EVENT);
-			//	
+			//
+			RECIPE[iii+1].FRC_MIDDLE= (int)RCP.GetStepItemReal(iii, "PR_FRC_MIDDLE"	);			
+			sprintf(szTemp, "RECIPE[%d].FRC_MIDDLE = %d", iii, RECIPE[iii+1].FRC_MIDDLE);	Make_Log("", szTemp, EVENT);
+	
 
 			ii_return = RCP.GetStepItemInt(iii, "PR_SRF_CTRL"	);
 			if	   (ii_return == 0)	sprintf(RECIPE[iii+1].SRF_CTRL, "NONE");
@@ -1461,6 +1488,7 @@ SEQ_STATUS RECIPE_READING(const void* pParam, int nNumOfBytesRecved)
 			sprintf(szTemp, "RECIPE[%d].VVC_MOTER_TABLE = %d", iii, RECIPE[iii+1].VVC_MOTER_TABLE);		Make_Log("", szTemp, EVENT);
 
 	
+					
 			RECIPE[iii+1].PIN_POS= RCP.GetStepItemReal(iii, "PR_PIN_POS"	);		
 			sprintf(szTemp, "RECIPE[%d].PIN_POS = %d", iii, RECIPE[iii+1].PIN_POS);				Make_Log("", szTemp, EVENT);	
 			
@@ -1483,6 +1511,10 @@ SEQ_STATUS RECIPE_READING(const void* pParam, int nNumOfBytesRecved)
 			RECIPE[iii+1].VVC05_POS= RCP.GetStepItemReal(iii, "PR_VVC05_POS"	);	
 			sprintf(szTemp, "RECIPE[%d].VVC05_POS = %.1f", iii, RECIPE[iii+1].VVC05_POS);	Make_Log("", szTemp, EVENT);	
 	
+			RECIPE[iii+1].VVC06_POS= RCP.GetStepItemReal(iii, "PR_VVC06_POS"	);	
+			sprintf(szTemp, "RECIPE[%d].VVC06_POS = %.1f", iii, RECIPE[iii+1].VVC06_POS);	Make_Log("", szTemp, EVENT);	
+	
+			
 			RECIPE[iii+1].CHILLER_CH01_TEMP= RCP.GetStepItemReal(iii, "PR_CHILLER_CH01_TEMP"	);	
 			sprintf(szTemp, "RECIPE[%d].CHILLER_CH01_TEMP = %.1f", iii, RECIPE[iii+1].CHILLER_CH01_TEMP);	Make_Log("", szTemp, EVENT);	
 			
@@ -1507,12 +1539,26 @@ SEQ_STATUS RECIPE_READING(const void* pParam, int nNumOfBytesRecved)
 			sprintf(szTemp, "RECIPE[%d].PRESSURE = %f", iii, RECIPE[iii+1].PRESSURE);				Make_Log("", szTemp, EVENT);
 			
 
-			strEPDRecipe.Format(_TEXT("%s") , RCP.GetStepItemString(iii , "PR_EPD_RECIPE") );
-			sprintf( RECIPE[iii+1].EPD_RECIPE    , "%s" , strEPDRecipe.CStr()  );	
-			sprintf(szTemp, "RECIPE[%d].EPD_RECIPE = %s", iii, RECIPE[iii+1].EPD_RECIPE);			Make_Log("", szTemp, EVENT);
+				//
+			RECIPE[iii+1].EPD_RCPNUM= RCP.GetStepItemReal(iii, "PR_EPD_RECIPENUM"	);
+			sprintf(szTemp, "RECIPE[%d].EPD_RCPNUM = %d", iii, RECIPE[iii+1].EPD_RCPNUM);			Make_Log("", szTemp, EVENT);
+			
 
 			RECIPE[iii+1].EPD_MINTIME= RCP.GetStepItemReal(iii, "PR_EPD_MIN_TIME"	);
 			sprintf(szTemp, "RECIPE[%d].EPD_MINTIME = %d", iii, RECIPE[iii+1].EPD_MINTIME);			Make_Log("", szTemp, EVENT);
+		
+			RECIPE[iii+1].EPD_STEPNUM= RCP.GetStepItemReal(iii, "PR_EPD_STEPNUM"	);	
+			sprintf(szTemp, "RECIPE[%d].EPD_STEPNUM = %d", iii, RECIPE[iii+1].EPD_STEPNUM);			Make_Log("", szTemp, EVENT);
+			
+			RECIPE[iii+1].EPD_ALARM= RCP.GetStepItemReal(iii, "PR_EPD_ALARM"	);					Make_Log("", szTemp, EVENT);
+			sprintf(szTemp, "RECIPE[%d].EPD_ALARM = %d", iii, RECIPE[iii+1].EPD_ALARM);
+	
+
+			RECIPE[iii+1].EPD_OVRETCHTYPE= RCP.GetStepItemInt(iii, "PR_OVERETCH_TYPE"	);			Make_Log("", szTemp, EVENT);
+			sprintf(szTemp, "RECIPE[%d].EPD_OVRETCHTYPE = %d", iii, RECIPE[iii+1].EPD_OVRETCHTYPE);
+	
+			RECIPE[iii+1].EPD_OVRETCHTIME= RCP.GetStepItemReal(iii, "PR_OVERETCH_VALUE"	);			Make_Log("", szTemp, EVENT);
+			sprintf(szTemp, "RECIPE[%d].EPD_OVRETCHTIME = %d", iii, RECIPE[iii+1].EPD_OVRETCHTIME);
 				
 			ii_return= RCP.GetStepItemInt(iii, "PR_ESC_CTRL"	);	
 			nIdleORNormal_Proc	=	EmpORNormal_Process.Read(nCS);
@@ -2603,7 +2649,7 @@ int End_Finish()
 			nPinCheckMode	= cDI_ProcEnd_PinCond.Read(nCS);
 			dCfgPos			= cAI_ProcEnd_aPinPos.Read(nCS);
 
-			if(nPinCheckMode == ePIN_BOTH_CHECK)		// Digital I/O XI_PIN_CurPosition 와 AI_Pin_Position 둘다 확인하겠다는 의미
+			if(nPinCheckMode == ePIN_BOTH_CHECK)		
 			{
 				if(XI_Pin_CurPosition.Read(nCS) >= nCfgPos)
 				{
@@ -2615,7 +2661,7 @@ int End_Finish()
 					}
 				}
 			}
-			else if(nPinCheckMode  == ePIN_AIO_CHECK)	// Analog I/O AI_PIN0_CurPosition 만 보겠다는 의미
+			else if(nPinCheckMode  == ePIN_AIO_CHECK)	// Analog I/O AI_PIN0_CurPosition 
 			{
 				if(AI_CPin1Pos.Read(nCS) > dCfgPos - 1 && AI_CPin1Pos.Read(nCS) < MAX_ANALOG_PIN_POS)
 				{
@@ -2624,9 +2670,9 @@ int End_Finish()
 					return 1;
 				}
 			}
-			else										// Digital I/O XI_PIN_CurPosition 만 확인하겠다는 의미.
+			else										// Digital I/O XI_PIN_CurPosition 
 			{
-				if(XI_Pin_CurPosition.Read(nCS) >= nCfgPos)	// 특정 위치보다 높은 곳에 있을 경우...그냥 빠져 나온다.
+				if(XI_Pin_CurPosition.Read(nCS) >= nCfgPos)	//
 				{
 					Make_Log("Pin Position Ok - Digital", "ENDED", EVENT);
 					Make_Log("END_FINISH", "ENDED", EVENT);
@@ -2693,7 +2739,7 @@ int End_Finish()
 			nPinCheckMode	= cDI_ProcEnd_PinCond.Read(nCS);;
 			dCfgPos			= cAI_ProcEnd_aPinPos.Read(nCS);
 			
-			if(nPinCheckMode == ePIN_BOTH_CHECK)		// Digital I/O XI_PIN_CurPosition 와 AI_Pin_Position 둘다 확인하겠다는 의미
+			if(nPinCheckMode == ePIN_BOTH_CHECK)		// Digital I/O XI_PIN_CurPosition 
 			{
 				if(XI_Pin_CurPosition.Read(nCS) == nCfgPos)
 				{
@@ -2705,7 +2751,7 @@ int End_Finish()
 					}
 				}
 			}
-			else if(nPinCheckMode  == ePIN_AIO_CHECK)	// Analog I/O AI_PIN0_CurPosition 만 보겠다는 의미
+			else if(nPinCheckMode  == ePIN_AIO_CHECK)	// Analog I/O AI_PIN0_CurPosition 
 			{
 				if(AI_CPin1Pos.Read(nCS) > dCfgPos - 1 && AI_CPin1Pos.Read(nCS) < MAX_ANALOG_PIN_POS)
 				{
@@ -2714,7 +2760,7 @@ int End_Finish()
 					return 1;
 				}
 			}
-			else										// Digital I/O XI_PIN_CurPosition 만 확인하겠다는 의미.
+			else										// Digital I/O XI_PIN_CurPosition 
 			{
 				if(XI_Pin_CurPosition.Read(nCS) == nCfgPos)
 				{
@@ -2803,7 +2849,7 @@ int End_TimeStable()
 		{
 			Make_Log("", "PM_PROC_CTRL(ePROC_ABORT)", EVENT);
 			
-			eDO_EPD_Cmd.Write(eEPD_Cmd_Stop,nCS);
+			eDO_EPD_Cmd.Write(eEPD_CMD_STOP,nCS);
 			Abort();
 			
 			Make_Log("END_TIMESTABLE", "PM_PROC_CTRL == ePROC_ABORT", FAULT);
@@ -2815,7 +2861,7 @@ int End_TimeStable()
 		if(nFunctionAbortCheck > 0)			
 		{
 			Abort();
-			eDO_EPD_Cmd.Write(eEPD_Cmd_Stop,nCS);
+			eDO_EPD_Cmd.Write(eEPD_CMD_STOP,nCS);
 			Make_Log("END_TIMESTABLE", "CheckAbortSts > 0", FAULT);
 			Make_Log("END_TIMESTABLE", "ENDED", EVENT);
 			return -1;
@@ -2827,7 +2873,7 @@ int End_TimeStable()
 
 			Abort();
 			
-			eDO_EPD_Cmd.Write(eEPD_Cmd_Stop,nCS);
+			eDO_EPD_Cmd.Write(eEPD_CMD_STOP,nCS);
 			Make_Log("END_TIMESTABLE", "_Is_Interlocked", FAULT);
 			Make_Log("END_TIMESTABLE", "ENDED", EVENT);
 			return -1;
@@ -2899,7 +2945,7 @@ int End_TimeStable()
 
 	if( nResultCnt == 8)	
 	{
-		eDO_EPD_Cmd.Write(eEPD_Cmd_Stop,nCS);
+		eDO_EPD_Cmd.Write(eEPD_CMD_STOP,nCS);
 		Make_Log("END_TIMESTABLE", "ENDED", EVENT);	
 		return  1;
 	}
@@ -2925,41 +2971,71 @@ int End_TimeStable()
 }
 
 
-int EPD_START_SET()
+int Control_EPD()
 {
-
 	int		CS;
-	int		EpdError			=	0;
-	char	szEpdRecipe[256]	=	{0};
-	char	szGlassName[256]	=	{0};
-	char	szStepName[256]		=	{0};
-	char	szTemp[256]			=	{0};
+	int		EpdError		=	0;
+
+	char	szGlassName[80]	=	{0};
+	char szGlassName2[80]	= {0};
+	char	szLotID[80]		=	{0};
+	char	szPortID[80]	=	{0};
+	char	szSlotID[80]	=	{0};
+	char	szTemp[256]		=	{0};
+	char	AlmMsg[256];				// 2020.05.21
+
 	EPD_ALARM_HAPPEN =FALSE;
 
-	PR_EPD_RECIPE.Read(szEpdRecipe,CS);
-	if(strcmp(szEpdRecipe,"") == 0 ) 
-	{
-		Make_Log("", "EPD No Use Step", EVENT);
-		return 1; 
-	}
+	eDO_EPD_Cmd.Write(eEPD_CMD_STOP,CS);		_sleep(100);
+	eDO_EPD_Cmd.Write(eEPD_CMD_RST,CS);
 	
-	//DATA SET
-	eDO_EPD_Cmd.Write(eEPD_Cmd_Reset,CS);		_sleep(100);
-	GLASS_ID.Read(szGlassName,CS);
-	eSO_EPD_RcpName.Write(RECIPE_NAME , CS);
-	eSO_EPD_StepName.Write(RECIPE[g_nCurrent_Step_Number].STEP_NAME,CS);
-	if(PM_GLASS_STS.Read(CS) == GLS_NONE)	eSO_EPD_GlassName.Write("NoGlass",CS);
-	else									eSO_EPD_GlassName.Write(szGlassName,CS);	
-	eDO_EPD_Cmd.Write(eEPD_Cmd_WaferInfo,CS); _sleep(100);
+	eAO_EPD_RecipeNum.Write(RECIPE[g_nCurrent_Step_Number].EPD_RCPNUM,CS);
+	eAO_EPD_EPDStepNum.Write(RECIPE[g_nCurrent_Step_Number].EPD_STEPNUM,CS);
+	eAO_EPD_EQPStepNum.Write(g_nCurrent_Step_Number,CS);
 
-	eSO_EPD_UseRecipe.Write(szEpdRecipe,CS);
-	eDO_EPD_Cmd.Write(eEPD_Cmd_Start,CS);	_sleep(100);
-	
-	sprintf(szTemp, "StepName=%s, EQPStepNum=%d, EPD Recipe=%s", RECIPE[g_nCurrent_Step_Number].STEP_NAME, g_nCurrent_Step_Number, szEpdRecipe);
-	Make_Log("", szTemp, EVENT);
-	
+	GLASS_ID.Read(szGlassName,CS);
+	LOT_ID.Read(szLotID,CS);
+	PORT_ID.Read(szPortID,CS);
+	SLOT_ID.Read(szSlotID,CS);
+	REAR_GLASS_ID.Read(szGlassName2,CS);		// A3 OCTA
+		
+	eSO_EPD_LotID.Write(szLotID,CS);
+	eSO_EPD_PortID.Write(szPortID,CS);
+	eSO_EPD_SlotID.Write(szSlotID,CS);
+	eSO_EPD_RcpName.Write(RECIPE_NAME , CS);
+	eSO_EPD_GlassName.Write(szGlassName,CS);
+	eSO_EPD_GlassName2.Write(szGlassName2,CS);		// A3 OCTA
+
+	if(PM_GLASS_STS.Read(CS) == GLS_NONE) eSO_EPD_GlassName.Write("NoGlass",CS);
 	_sleep(100);
+
+	eDO_EPD_Cmd.Write(eEPD_CMD_RCPINFO,CS); _sleep(100);
+	eDO_EPD_Cmd.Write(eEPD_CMD_RCPNO,CS);	_sleep(100);
 	
+	sprintf(szTemp, "StepName=%s, EQPStepNum=%d, EPDRcpNum=%d, EPDRcpStepNum=%d", 
+		RECIPE[g_nCurrent_Step_Number].STEP_NAME, g_nCurrent_Step_Number, RECIPE[g_nCurrent_Step_Number].EPD_RCPNUM, RECIPE[g_nCurrent_Step_Number].EPD_STEPNUM);
+
+	Make_Log("", szTemp, EVENT);
+
+	_sleep(300);
+
+	EpdError = eDI_EPD_Error.Read(CS);
+
+	if(EpdError > 1) 
+	{
+		// 2020.05.21
+		memset( AlmMsg , 0x00 , sizeof(AlmMsg) );
+		sprintf( AlmMsg , "EPD ERROR STATUS IS ON. ERROR CHECK. ERROR CODE [%d]" , EpdError );
+
+		//EPD_5504.PostAnyTh(AlmMsg); // KJC 
+		EPD_ALARM_HAPPEN =TRUE;
+		Make_Log("", "EPD_ALARM_HAPPEN Change True[1]", EVENT);
+
+		Abort();
+
+		return -1; // 2020.03.30, jihyun
+	}
+
 	return 1;
 }
 
@@ -2967,31 +3043,37 @@ int EPD_START_SET()
 int End_EPD()
 {
 	TTimer EPDTimer;
-	TTimer JUSTENDTimer;
 
 	int		CS						= 0;
 	int		nAlarm_Action			= 0;
 	int		nResult					= 0;
 	int		nCheckSts				= 0;
 	int		nEPD_Result				= 0;
+	int		nOverEtch_Use			= 0;
+	int		nUnderEtch_Use			= 0;
 	int		nRampSts				= -1;
-	int		nSRF_result				= 0;
-	int		nBRF_result				= 0;
-	int		nSRF_RampStatus			= -1;
-	int		nBRF_RampStatus			= -1;	
+	int		nHRF_result				= 0;
+	int		nLRF_result				= 0;
+	int		nHRF_RampStatus			= -1;
+	int		nLRF_RampStatus			= -1;	
 	int		nCheckStableTime		= 0;
 	int		nInterlocked			= 0;
-	int     nJustEtchDetector		= 0; 
 
 	double	dElapsedTime			= 0.0;
+	double	dEndPointTime			= 0.0;
+	double	dOverEtchTime			= 0.0;
 	double	dJustEtchTime			= 0.0;
-	double	dTotalEtchTime			= 0.0;
+	double	dRcp_OverEtchTime		= 0.0;
+	double	dRcp_OverEtchPercent	= 0.0;
 	double	dGetTime1				= 0.0;
 	double	dGetTime2				= 0.0;
 	double	stepTime;
+	double	warningLimit			= 0;
+	double	alarmLimit				= 0;
+	double	dSRC_FwdPwr				= 0.0;
+	double	dBIAS_FwdPwr			= 0.0;		
 	double	dStepTime				= 0.0;
 	double	dRcpStepTime			= 0.0;
-	double	alarmLimit				= 0.0;
 
 	char	szGetError[128]			= {0};
 	char	szTmep[128]				= "";
@@ -3002,15 +3084,61 @@ int End_EPD()
 	Make_Log("END_EPD", "STARTED", EVENT);
 
 	EPDTimer.Start();
-	JUSTENDTimer.Start();
-	dElapsedTime	= Step_CurTime.Read(CS);
-
+	dElapsedTime = Step_CurTime.Read(CS);
 	dRcpStepTime = RECIPE[g_nCurrent_Step_Number].STEP_TIME;
 	dStepTime	 = dRcpStepTime;
 
 	do 
 	{
 
+		if(nRampSts < 0 && RECIPE[g_nCurrent_Step_Number].SRFG_POWER > 0 && RECIPE[g_nCurrent_Step_Number].BRFG_POWER > 0)
+		{
+			dSRC_FwdPwr  = eAI_SRFG_FwdPwr.Read(CS);
+			dBIAS_FwdPwr = eAI_BRFG_FwdPwr.Read(CS);
+			
+			if(dSRC_FwdPwr > 0.98 * RECIPE[g_nCurrent_Step_Number].SRFG_POWER && dSRC_FwdPwr < 1.02 * RECIPE[g_nCurrent_Step_Number].SRFG_POWER)
+			{
+				nHRF_RampStatus = 1;
+			}
+			
+			if(dBIAS_FwdPwr > 0.98 * RECIPE[g_nCurrent_Step_Number].BRFG_POWER && dBIAS_FwdPwr < 1.02 * RECIPE[g_nCurrent_Step_Number].BRFG_POWER)
+			{
+				nLRF_RampStatus = 1;
+			}
+			
+			if(nHRF_RampStatus == 1 && nLRF_RampStatus == 1)
+			{
+				nRampSts = 0;
+			}
+			
+		}
+		else if(nRampSts == 0)
+		{
+			nHRF_result = FNC_SRF.Status();
+			nLRF_result = FNC_BRF.Status();
+
+			if(nHRF_result == SEQ_SUCCESS && nLRF_result == SEQ_SUCCESS)
+			{
+				nRampSts = 1;
+			}
+		}
+		
+		if(nRampSts == 1 && nCheckStableTime < 999)
+		{
+			nCheckStableTime++;	
+		}
+		
+		if(nCheckStableTime == 5)	
+		{
+			
+			if(RECIPE[g_nCurrent_Step_Number].SRFG_POWER > 3000 && RECIPE[g_nCurrent_Step_Number].BRFG_POWER > 3000)
+			{				
+				nCheckStableTime = 999;
+				
+				sprintf(szTmep, "Ramp up Completed");
+				Make_Log("", szTmep, EVENT);
+			}
+		}
 		if(PM_PROC_CTRL.Read(CS) == ePROC_ABORT)
 		{
 			Make_Log("", "PM_PROC_CTRL(ePROC_ABORT)[1]", EVENT);
@@ -3019,8 +3147,23 @@ int End_EPD()
 			break;
 		}
 
-		nFunctionAbortCheck = CheckAbortSts();
-		if(nFunctionAbortCheck > 0)		
+
+		if(eDI_EPD_Error.Read(CS) != 0)
+		{ 
+			CEnum en;
+			en = eDI_EPD_Error.GetEnum();
+
+			sprintf(szTemp, "EPD Error was detected. : %s", en.GetEnumStr(eDI_EPD_Error.Read(CS) ) );
+			Make_Log("", szTemp, FAULT);
+			
+			nEPD_Result = -2;
+			
+			break;
+		}
+
+		nCheckSts = CheckAbortSts();
+	
+		if(nCheckSts > 0)		
 		{
 			Make_Log("", "Sub Function Status is Failure", FAULT);
 			
@@ -3037,23 +3180,19 @@ int End_EPD()
 			break;
 		}
 
-		nEPD_Result = eDI_EPD_EVENT_ID.Read(CS);
-		if(nEPD_Result == eEPD_Result_UserEve)
+
+		nEPD_Result = eDI_EPD_EndPoint.Read(CS);
+		if(nEPD_Result == eEPD_DETECTED)
 		{
-			Make_Log("", "EPD TotalEctch is Finished", EVENT);
+			Make_Log("", "EPD Endpoint is detected", EVENT);
 			break;
 		}
-		else if(nEPD_Result == eEPD_Result_End_Point && nJustEtchDetector == 0)
+		else if(nEPD_Result == eEPD_STOPPED)
 		{
-			nJustEtchDetector =1;
-
-			if(nJustEtchDetector ==1)
-			{
-				Make_Log("", "EPD JustEctch is Finished", EVENT);
-				dJustEtchTime = JUSTENDTimer.ElapsedTime()/1000;
-			}
+			Make_Log("", "EPD is stopped", EVENT);
+			break;
 		}
-			
+		
 		g_dblCurrentStepTime    = dElapsedTime + EPDTimer.ElapsedTime()/1000;
 		g_dblCurrentProcessTime = g_dblStepInProcessTime + g_dblCurrentStepTime;
 
@@ -3065,94 +3204,254 @@ int End_EPD()
 	}while(RECIPE[g_nCurrent_Step_Number].STEP_TIME > g_dblCurrentStepTime);
 
 
-	if(RECIPE[g_nCurrent_Step_Number].Is_RF_Step > 0)
+	if(RECIPE[g_nCurrent_Step_Number].Is_RF_Step >  0)
 	{
 		g_dblTotalProcessTime += g_dblCurrentStepTime;
 	}
 	
 	eAO_TotalEtchTime.Write(g_dblTotalProcessTime,CS);	
-
-	EPD_JustEtchTime.Write(dJustEtchTime+1,CS);
-	EPD_TotalEtchTime.Write(g_dblCurrentStepTime+1,CS);
-
-	if(nEPD_Result == eEPD_Result_UserEve)
+	
+	
+	if(nEPD_Result == eEPD_DETECTED)
 	{
 
 		stepTime	 = RECIPE[g_nCurrent_Step_Number].STEP_TIME;
 		alarmLimit   = RECIPE[g_nCurrent_Step_Number].EPD_MINTIME;
 
-		if(g_dblCurrentStepTime < alarmLimit &&  alarmLimit >0 )
+		if(g_dblCurrentStepTime < alarmLimit)
 		{
-			EPD_ALARM_HAPPEN =TRUE;
 			EPD_5504.PostAnyTh(_TEXT("EPD_End point signal is too fast detected"));			//5503
-			eDO_EPD_Cmd.Write(eEPD_Cmd_Stop,CS);
+			eDO_EPD_Cmd.Write(eEPD_CMD_STOP,CS);
 			
-			Abort();	_sleep(1000);
-				
-			Step_CurTime.Write(g_dblCurrentStepTime,CS);
-			Rcp_CurTime.Write(g_dblCurrentProcessTime,CS);
+			if(EPD_ALARM_ABORT_NOW)
+			{
+				Abort();	_sleep(1000);
 
-			Make_Log("", "EPD End Point Fast detected Aborted", EVENT);			
-			Make_Log("END_EPD", "ENDED", EVENT);
+				dGetTime1 = eAI_EPD_TotalEtchTime.Read(CS);
+				Step_CurTime.Write(dGetTime1,CS);
+			
+				dGetTime2 = eAI_EPD_JustEtchTime.Read(CS);
+			
+				sprintf(szTemp, "eAI_EPD_TotalEtchTime = %.2f, eAI_EPD_JustEtchTime = %.2f", dGetTime1, dGetTime2);
+				Make_Log("", szTemp, EVENT);
+			
+				g_dblCurrentStepTime    = dGetTime1;	
+				g_dblCurrentProcessTime = g_dblStepInProcessTime + g_dblCurrentStepTime;
 
-			return -1;
+				Step_CurTime.Write(g_dblCurrentStepTime,CS);
+				Rcp_CurTime.Write(g_dblCurrentProcessTime,CS);
+			
+				Make_Log("END_EPD", "ENDED", EVENT);
+
+				return -1;
+			}
 		}
 
 	}
-	else if(nEPD_Result >= 0  && nEPD_Result < eEPD_Result_UserEve )
-	{
 
+	
+	if(nEPD_Result < 0 || nEPD_Result == 2) 
+	{
 		EPD_ALARM_HAPPEN =TRUE;
 		Make_Log("", "EPD_ALARM_HAPPEN Change True[2]", EVENT);
-		EPD_5504.PostAnyTh(_TEXT("EPD_End point signal is not detected"));
-		eDO_EPD_Cmd.Write(eEPD_Cmd_Stop,CS);
-		
-		Abort();	
-		_sleep(1000);
-						
-		Step_CurTime.Write(g_dblCurrentStepTime,CS);
-		Rcp_CurTime.Write(g_dblCurrentProcessTime,CS);
+
+
+		if		(nEPD_Result ==  2)		EPD_5504.PostAnyTh(_TEXT("EPD_End point signal is not detected"));
+		else if (nEPD_Result == -2)		EPD_5504.PostAnyTh(_TEXT("EPD Result is Error. EPD Check"));
+
+		eDO_EPD_Cmd.Write(eEPD_CMD_STOP,CS);
+
+		if(EPD_ALARM_ABORT_NOW)
+		{
+			Abort();
 			
-		Make_Log("", "EPD End Point Not detected Aborted", EVENT);			
-		Make_Log("END_EPD", "ENDED", EVENT);
-		
-		return -1;
-	}
-	else if( nEPD_Result < 0 ) 
-	{
-		EPD_ALARM_HAPPEN =TRUE;
-		Abort();	
-		_sleep(1000);
-		
-		Step_CurTime.Write(g_dblCurrentStepTime,CS);
-		Rcp_CurTime.Write(g_dblCurrentProcessTime,CS);
-		
-		Make_Log("", "EPD Step Alarm Abort", EVENT);			
-		Make_Log("END_EPD", "ENDED", EVENT);
+			_sleep(1000);
+			
+			dGetTime1 = g_dblCurrentStepTime;
+			dGetTime2 = eAI_EPD_JustEtchTime.Read(CS);
+			
+			sprintf(szTemp, "eAI_EPD_TotalEtchTime = %.2f, eAI_EPD_JustEtchTime = %.2f", dGetTime1, dGetTime2);
+			Make_Log("", szTemp, EVENT);
+			
+			g_dblCurrentStepTime    = dGetTime1;	
+			g_dblCurrentProcessTime = g_dblStepInProcessTime + g_dblCurrentStepTime;
+			
+			Step_CurTime.Write(g_dblCurrentStepTime,CS);
+			Rcp_CurTime.Write(g_dblCurrentProcessTime,CS);
+			
+			
+			Make_Log("END_EPD", "ENDED", EVENT);
+			return -1;
 
+		}
 	}
 
-	if(GetResultOfFunction(1)==8)
-	{
-		eDO_EPD_Cmd.Write(eEPD_Cmd_Stop,CS);
-		Make_Log("END_EPD", "ENDED", EVENT);
-		return 1;	
-	}
-	else
-	{
-		eDO_EPD_Cmd.Write(eEPD_Cmd_Stop,CS);
-	
+
+	if(GetResultOfFunction(1) != 8)
+	{	
+		eDO_EPD_Cmd.Write(eEPD_CMD_STOP,CS);
+
 		Abort();
+
 		_sleep(1000);
+		
+		dGetTime1 = g_dblCurrentStepTime;	
+		dGetTime2 = eAI_EPD_JustEtchTime.Read(CS);
+		
+		sprintf(szTemp, "eAI_EPD_TotalEtchTime = %.2f, eAI_EPD_JustEtchTime = %.2f", dGetTime1, dGetTime2);
+		Make_Log("", szTemp, EVENT);
+		
+		g_dblCurrentStepTime    = dGetTime1;
+		g_dblCurrentProcessTime = g_dblStepInProcessTime + g_dblCurrentStepTime;
 		
 		Step_CurTime.Write(g_dblCurrentStepTime,CS);
 		Rcp_CurTime.Write(g_dblCurrentProcessTime,CS);
-		
+
+
 		Make_Log("END_EPD", "ENDED", EVENT);
 		return -1;
+	}
+
+
+	if(nEPD_Result != eEPD_DETECTED)
+	{	
+		eDO_EPD_Cmd.Write(eEPD_CMD_STOP,CS);
+
+		//20190603
+		//Kim CS B Confirm
+		Abort();
+
+		Make_Log("", "EPD_ALARM_HAPPEN Change True[3]", EVENT);
+		EPD_ALARM_HAPPEN =TRUE;
+
+		dGetTime1 = g_dblCurrentStepTime;
+		dGetTime2 = eAI_EPD_JustEtchTime.Read(CS);
 		
+		sprintf(szTemp, "eAI_EPD_TotalEtchTime = %.2f, eAI_EPD_JustEtchTime = %.2f", dGetTime1, dGetTime2);
+		Make_Log("", szTemp, EVENT);
+
+		g_dblCurrentStepTime    = dGetTime1;	
+		g_dblCurrentProcessTime = g_dblStepInProcessTime + g_dblCurrentStepTime;
+		
+		Step_CurTime.Write(g_dblCurrentStepTime,CS);
+		Rcp_CurTime.Write(g_dblCurrentProcessTime,CS);
+
+
+		if(PR_EPD_ALARM.Read(CS) == 1)
+		{
+			Make_Log("", "EPD Endpoint not detected. But, PR_EPD_ALARM(= 1)", FAULT);
+			Make_Log("END_EPD", "ENDED", EVENT);
+			return 1;
+		}
+		else
+		{
+			Make_Log("", "EPD Endpoint not detected", FAULT);
+			Make_Log("END_EPD", "ENDED", EVENT);
+			return -1;
+		}
 	}
 	
+	nOverEtch_Use = PR_OVERETCH_TYPE.Read(CS);
+
+	if		(nOverEtch_Use == 1)	{	nResult = 2;	}
+	else if	(nOverEtch_Use == 2)	{	nResult = 3;	}
+	else							{	nResult = 99;	}	
+
+	if		(nResult == 2)			
+	{	
+		dRcp_OverEtchTime	= PR_OVERETCH_VALUE.Read(CS);
+		if(dRcp_OverEtchTime == 0.0)	nResult = 99;
+	}	
+	else if	(nResult == 3)			
+	{
+		dRcp_OverEtchPercent= PR_OVERETCH_VALUE.Read(CS);
+		if(dRcp_OverEtchPercent == 0.0)	nResult = 99;
+	}
+
+	if(nResult == 99)
+	{
+		dEndPointTime =eAI_EPD_JustEtchTime.Read(CS);
+		sprintf(szTemp, "EPD Just Etch O.K - CurrentStepTime = %.1f, EndPointTime = %.1f", g_dblCurrentStepTime, dEndPointTime);
+		Make_Log("", szTemp, EVENT);
+		Make_Log("END_EPD", "ENDED", EVENT);
+		
+		g_dblCurrentProcessTime = g_dblStepInProcessTime + g_dblCurrentStepTime;
+		
+		if(RECIPE[g_nCurrent_Step_Number].Is_RF_Step > 0)
+		{
+			g_dblTotalProcessTime += g_dblCurrentStepTime;
+		}
+	
+		eAO_JustEtchTime.Write(dEndPointTime,CS);
+		eAO_TotalEtchTime.Write(g_dblTotalProcessTime,CS);
+		Step_CurTime.Write(g_dblCurrentStepTime,CS);
+		Rcp_CurTime.Write(g_dblCurrentProcessTime,CS);
+
+		return 1;		
+	}
+
+	dEndPointTime = eAI_EPD_TotalEtchTime.Read(CS);
+	dJustEtchTime = eAI_EPD_JustEtchTime.Read(CS);
+	dOverEtchTime = dEndPointTime - dJustEtchTime;
+				
+	g_dblCurrentProcessTime = g_dblStepInProcessTime + g_dblCurrentStepTime;
+	
+
+	Step_CurTime.Write(g_dblCurrentStepTime,CS);
+	Rcp_CurTime.Write(g_dblCurrentProcessTime,CS);
+
+	if(RECIPE[g_nCurrent_Step_Number].Is_RF_Step > 0)
+	{
+		g_dblTotalProcessTime += g_dblCurrentStepTime;
+	}
+	
+	eAO_JustEtchTime.Write(dJustEtchTime,CS);
+	eAO_TotalEtchTime.Write(g_dblTotalProcessTime,CS);
+
+
+	if		(nResult == 2)	
+	{
+		if(dEndPointTime >= dJustEtchTime + dRcp_OverEtchTime)
+		{
+			sprintf(szTemp, "OverEtch O.K - CurrentStepTime = %.1f, Total=%.1f, JusEtch=%.1f, rOverEtchTime=%.1f", g_dblCurrentStepTime, dEndPointTime, dJustEtchTime, dOverEtchTime);
+			Make_Log("", szTemp, EVENT);
+
+			Make_Log("END_EPD", "ENDED", EVENT);
+			return 1;	
+		}
+		else
+		{
+			sprintf(szTemp, "OverEtch NotOk - CurrentStepTime = %.1f, Total=%.1f, JusEtch=%.1f, rOverEtchTime=%.1f", g_dblCurrentStepTime, dEndPointTime, dJustEtchTime, dOverEtchTime);
+			Make_Log("", szTemp, EVENT);
+		}
+	}
+	else if	(nResult == 3)	
+	{	
+		if(dEndPointTime >= (dJustEtchTime + ( dJustEtchTime * dRcp_OverEtchPercent ) * 0.01))
+		{
+			sprintf(szTemp, "OverEtch O.K - CurrentStepTime=%.1f, Total=%.1f, JustEtch=%.1f, rOverEtchRatio=%.1f", g_dblCurrentStepTime, dEndPointTime, dJustEtchTime, dRcp_OverEtchPercent);
+			Make_Log("", szTemp, EVENT);
+			
+			Make_Log("END_EPD", "ENDED", EVENT);
+			return 1;
+		}
+		else
+		{
+			sprintf(szTemp, "OverEtch NotOk - CurrentStepTime = %.1f, Total=%.1f, JustEtch=%.1f, rOverEtchRatio=%.1f", g_dblCurrentStepTime, dEndPointTime, dJustEtchTime, dRcp_OverEtchPercent);
+			Make_Log("", szTemp, EVENT);
+		}
+	}
+
+	if(PR_EPD_ALARM.Read(CS) == 1)
+	{
+		Make_Log("", "OverEtch is not O.K. But, PR_EPD_ALARM(= 1)", EVENT);
+		Make_Log("END_EPD", "ENDED", EVENT);
+		return 1;
+	}
+
+	Make_Log("", "EPD Process Time is under the OverEtch Condition", FAULT);
+	
+	Abort();
 	Make_Log("END_EPD", "ENDED", EVENT);
 
 	return -1;
@@ -3186,15 +3485,21 @@ SEQ_STATUS STEP_CONTROL(int nStepNum)
 	char	szTemp[128]			= {0};
 	char	szTemp2[128]		= {0};
 
+	int		nEPDControlState		= 0; // 2020.05.21
+
 	Make_Log("STEP_CONTROL", "STARTED", EVENT);
 
 	StepTimer.Start();
-	if(RECIPE[nStepNum].STEP_ENDTYPE == eTYPE_EPD)
-	{
-		isEpdMode = TRUE;
-		sprintf(szTemp2, "%s", "[EPD]");
-	}		
 
+	//2019.09.04
+	// EPD Mode 구별 이유 없음
+/* 
+	if(RECIPE[nStepNum].STEP_ENDTYPE == eTYPE_EPD)
+ 	{
+ 		isEpdMode = TRUE;
+ 		sprintf(szTemp2, "%s", "[EPD]");
+ 	}	
+*/	
 	g_dblCurrentStepTime	= 0;
 	g_dblStepInProcessTime	= Rcp_CurTime.Read(CS);
 
@@ -3229,16 +3534,20 @@ SEQ_STATUS STEP_CONTROL(int nStepNum)
  			
  		Make_Log("", "TM Gate Valve(= Open). Process aborted. Alarm 1005", FAULT);
  			
- 		return SEQ_ABORT; 
+ 			return SEQ_ABORT; 
  	}
+ 	
 
+	// 2019.09.04 A4 양예슬 PRO 요청
+	// EPD Step 시작 시 Step Time 갱신이 되지않음
+	// 아래에서 갱신하므로 해당 구문 삭제
+/*	
 	if( TRUE != isEpdMode )
 	{
 		g_dblCurrentStepTime = StepTimer.ElapsedTime()/1000;		
 		Update_StepTime();
 	}
-	
-
+*/
 	g_dblReStartStepTime	= 0.0;
 	g_dblTotalEtchTime		= 0.0;	
 	g_dblEtchingTime		= 0.0;
@@ -3246,12 +3555,18 @@ SEQ_STATUS STEP_CONTROL(int nStepNum)
 	Make_Log("", "Call SetRcpParamToFunParam", EVENT);
 	SetRcpParamToFunParam(nStepNum);
 
+	g_dblCurrentStepTime = StepTimer.ElapsedTime()/1000;		
+	Update_StepTime();
+
+	// 2019.09.04
+	// 해당 구문에서 EPD 포함 전 Step 시작 시 Timer Reset
+/*
 	if( TRUE != isEpdMode )
 	{
 		g_dblCurrentStepTime = StepTimer.ElapsedTime()/1000;		
 		Update_StepTime();
 	}
-
+*/
 	nRFCheck = 0;
 
 	if(RECIPE[nStepNum].STEP_ENDTYPE == eTYPE_COND) 
@@ -3424,19 +3739,17 @@ SEQ_STATUS STEP_CONTROL(int nStepNum)
 			Itk_SRC_Mon.Write(Mon_En,CS);
 			Itk_BIAS_Mon.Write(Mon_En,CS);
 
-			if(RECIPE[nStepNum].Is_RF_Step ==1 )
+			if(RECIPE[nStepNum].STEP_ENDTYPE == eTYPE_TIME && RECIPE[nStepNum].EPD_RCPNUM !=0 && RECIPE[nStepNum].EPD_STEPNUM !=0 )
 			{
 				Make_Log("TIME", "CONTROL_EPD SET", EVENT);	
-				EPD_START_SET();
-
-				if(eDI_EPD_VTY_START.Read(CS) == eEPD_Check_Fail) 
-				{
-					EPD_5504.PostAnyTh(_TEXT("EPD ERROR STATUS IS ON. ERROR CHECK"));
-					EPD_ALARM_HAPPEN =TRUE;
-					Make_Log("", "EPD_ALARM_HAPPEN Change True[1]", EVENT);
-				}
-
+				
+				// 2020.05.21
+				// Control_EPD();
+				nEPDControlState = Control_EPD(); // 2020.03.30, jihyun
+				if( nEPDControlState < 0 ) { return SEQ_ABORT; }
 			}
+
+			
 					
 			sprintf(szLog, "SRF_Setpoint = %.0f, BRF_Setpoint = %.0f", (double)(RECIPE[nStepNum].SRFG_POWER), (double)(RECIPE[nStepNum].BRFG_POWER));
 			Make_Log("", szLog, EVENT);
@@ -3508,6 +3821,12 @@ SEQ_STATUS STEP_CONTROL(int nStepNum)
 			{
 				FNC_RF_CTRL.RunTh(_TEXT("PROC_RF_HIGH"));
 				Make_Log("", "RF : PROC_RF_HIGH", EVENT);
+
+				if(RECIPE[nStepNum].STEP_ENDTYPE == eTYPE_TIME && RECIPE[nStepNum].EPD_RCPNUM !=0 && RECIPE[nStepNum].EPD_STEPNUM !=0 )
+				{
+					Make_Log("", "RF : PROC_RF_HIGH. EPD START RUN", EVENT);
+					eDO_EPD_Cmd.Write(eEPD_CMD_START,CS);
+				}
 				
 			}
 			else if(nRFCheck == 0x02)
@@ -3520,6 +3839,12 @@ SEQ_STATUS STEP_CONTROL(int nStepNum)
 			{
 				FNC_RF_CTRL.RunTh(_TEXT("PROC_RF_DUAL"));
 				Make_Log("", "RF : PROC_RF_DUAL", EVENT);
+
+				if(RECIPE[nStepNum].STEP_ENDTYPE == eTYPE_TIME && RECIPE[nStepNum].EPD_RCPNUM !=0 && RECIPE[nStepNum].EPD_STEPNUM !=0 )
+				{
+					Make_Log("", "RF : PROC_RF_DUAL. EPD START RUN", EVENT);
+					eDO_EPD_Cmd.Write(eEPD_CMD_START,CS);
+				}
 
 			}
 			else
@@ -3756,13 +4081,13 @@ int _Init_Step(int nStepNo)
 	RECIPE[nStepNo].GAS10 = 0;
 
 	RECIPE[nStepNo].FRC_CENTER= 0;
+	RECIPE[nStepNo].FRC_MIDDLE= 0;
 
 	sprintf(RECIPE[nStepNo].SRF_CTRL, "");
 	sprintf(RECIPE[nStepNo].BRF_CTRL, "");
 	sprintf(RECIPE[nStepNo].HE_CTRL,  "");
 	sprintf(RECIPE[nStepNo].APC_CTRL, "");
 	sprintf(RECIPE[nStepNo].ESC_CTRL, "");
-	sprintf(RECIPE[nStepNo].EPD_RECIPE, "");
 
 	RECIPE[nStepNo].SRFG_POWER		= 0;
 	RECIPE[nStepNo].SRFM_MATCH		= 0;
@@ -3773,6 +4098,11 @@ int _Init_Step(int nStepNo)
 	RECIPE[nStepNo].BRFM_TUNE		= 0;
 
 	RECIPE[nStepNo].PRESSURE		= 0;
+	RECIPE[nStepNo].EPD_RCPNUM		= 0;
+	RECIPE[nStepNo].EPD_STEPNUM		= 0;
+	RECIPE[nStepNo].EPD_ALARM		= 0;
+	RECIPE[nStepNo].EPD_OVRETCHTIME = 0;
+	RECIPE[nStepNo].EPD_OVRETCHTYPE = 0;
 
 	RECIPE[nStepNo].ESC_VOLT		= 0;
 	RECIPE[nStepNo].HE_PRESSURE		= 0;
@@ -4232,7 +4562,7 @@ void Process_End_Control()
 	Process_Run.Write(OFF,CS);
 	PROCESSLOG.RunAny( "LOG_END" );
 
-	utilIOLogPC.SendEventMsg(_TEXT("STOP"));			//CIM PC Remote Seq는 TMC_IO_LOG.SendEventMsg(_TEXT("STOP"));
+	utilIOLogPC.SendEventMsg(_TEXT("STOP"));			//CIM PC Remote Seq
 	Recipe_Max_Step.Write( 0 , CS );
 	Recipe_Step_Num.Write( 0 , CS );
 	Recipe_Step_Desc.Write( "" , CS );
@@ -4289,7 +4619,7 @@ BOOL GetRRecipeInfoFromSchedulerData(const char* szCommand) {
 	//								 1:Main Process
 	//								 2:Post Process
 	//								 9:Manual Process
-	//								 999:분산제어시 Network상 분리된 PM Run
+	//								 999:
 	//								 CM1:Cassette, 5:slot, A:Place Arm
 	int source=ePORT1, cnt, i;
 	TString strCmd;
@@ -4306,7 +4636,7 @@ BOOL GetRRecipeInfoFromSchedulerData(const char* szCommand) {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	if ( RECIPEINFO.RECIPETYPE == 1 ) {	//AUTO-RUN : MAIN PROCESS 일때만 처리함...
+	if ( RECIPEINFO.RECIPETYPE == 1 ) {	//AUTO-RUN : MAIN PROCESS 
 //		// DUMMY TYPE
 //		if ( strArg[3].Compare( _TEXT("D") ) ) RECIPEINFO.DUMMY=TRUE ;
 //		else								   RECIPEINFO.DUMMY=FALSE;
@@ -4617,8 +4947,8 @@ SEQ_STATUS SeqMain(const char* szCommand, const void* pParam, int nNumOfBytesRec
 	GLASS_ID.Read(mGlassID,CS);
 	Rcp_Name.Read(mRecipeID,CS);
 	PM_ModuleName.Read(mPcName,CS);
-	EPD_JustEtchTime.Write(0,CS);
-	EPD_TotalEtchTime.Write(0,CS);
+	eAO_JustEtchTime.Write(0,CS);
+	eAO_TotalEtchTime.Write(0,CS);
 	OnMessage.Write(RECIPE_NAME,CS);
 
 	sprintf(szTemp, "Process Recipe Name :[%s]",RECIPE_NAME);

@@ -89,6 +89,7 @@ typedef struct
 
 	//ADD
 	int     FRC_CENTER;
+	int     FRC_MIDDLE;
 	
 	char	SRF_CTRL[32];
 	char	BRF_CTRL[32];
@@ -106,8 +107,13 @@ typedef struct
 	
 	int     PIN_POS;
 	int		PRESSURE;
-	char	EPD_RECIPE[256];
+	int		EPD_RCPNUM;
 	int     EPD_MINTIME;
+	int		EPD_STEPNUM;
+	int		EPD_ALARM;
+	int		EPD_OVRETCHTYPE;
+	int		EPD_OVRETCHTIME;
+
 		
 	int		ESC_VOLT;
 	double	HE_PRESSURE;
