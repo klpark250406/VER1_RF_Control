@@ -978,10 +978,13 @@ BOOL OnKillDevice( void* pDrvData , int ID1 , int ID2 , int ID3 , int ID4 , int 
 	
 	_sleep(100);
 	
-	InOutMap[15].pWriteData[0]  = 0;	// Rf : Off, Filament : Off, DNetActive : Off
-	InOutMap[16].pWriteData[0] = 0;	// Rf : Off, Filament : Off, DNetActive : Off
-	DNS_WriteDeviceIo( CardHandle, DeviceConfig[9].MacId,  DNS_OUTPUT1, InOutMap[9].pWriteData,  DeviceConfig[9].Output1Size  ); _sleep(50);
-	DNS_WriteDeviceIo( CardHandle, DeviceConfig[10].MacId, DNS_OUTPUT1, InOutMap[10].pWriteData, DeviceConfig[10].Output1Size ); _sleep(50);
+	//KLP_EDIT
+	// 버퍼는 15/16을 지우면서 전송은 구 Kyosan MAC(9/10)으로 나가던 불일치 수정 → 전 구간 RFPT Gen MAC 매크로(15/16)로 통일.
+	// RFPT Gen Output byte4 = Control 비트필드(bit0=RF On) → 드라이버 언로드 시 RF Off 보장 (byte0 아님).
+	InOutMap[KYOSAN_SRFG_ID].pWriteData[4] = 0;	// Rf : Off, ArcDetect : Off, Reset : Off, Remote : Off
+	InOutMap[KYOSAN_BRFG_ID].pWriteData[4] = 0;	// Rf : Off, ArcDetect : Off, Reset : Off, Remote : Off
+	DNS_WriteDeviceIo( CardHandle, DeviceConfig[KYOSAN_SRFG_ID].MacId, DNS_OUTPUT1, InOutMap[KYOSAN_SRFG_ID].pWriteData, DeviceConfig[KYOSAN_SRFG_ID].Output1Size ); _sleep(50);
+	DNS_WriteDeviceIo( CardHandle, DeviceConfig[KYOSAN_BRFG_ID].MacId, DNS_OUTPUT1, InOutMap[KYOSAN_BRFG_ID].pWriteData, DeviceConfig[KYOSAN_BRFG_ID].Output1Size ); _sleep(50);
 	
  	LeaveCriticalSection(&mCS_Lock);
 	
@@ -1270,6 +1273,17 @@ void OnWriteDigital( void* pDrvData , void* , int ID1, int ID2, int ID3, int ID4
 	else if(ID1 == KYOSAN_SRFG_ID || ID1 == KYOSAN_BRFG_ID)
 	{
 		if(gnKYOSAN_RFCommSts[ID1 - KYOSAN_SRFG_ID] == FALSE)
+		{
+			*Result = FALSE;
+			return;
+		}
+	}
+	else if(ID1 == KYOSAN_SMAT_ID || ID1 == KYOSAN_BMAT_ID)
+	{
+		//KLP_EDIT
+		// Matcher(13/14) 통신 가드 추가 : RFPT는 Matcher byte8(AlarmRST/RemoteOut/Mode)를 DO로 능동 제어하므로,
+		// 통신 두절 시 쓰기를 거부하여 Gen 가드와 동일하게 상위 시퀀스가 통신 이상을 감지할 수 있도록 함.
+		if(gnKYOSAN_MatCommSts[ID1 - KYOSAN_SMAT_ID] == FALSE)
 		{
 			*Result = FALSE;
 			return;
@@ -1619,14 +1633,16 @@ void OnWriteAnalog( void* pDrvData , void* , int ID1, int ID2, int ID3, int ID4,
 		}
 	}
 	else if(ID1 == KYOSAN_SMAT_ID || ID1 == KYOSAN_BMAT_ID)
-	{/*
- 		if(gnKYOSAN_MatCommSts[ID1 - KYOSAN_SMAT_ID] == FALSE)
- 		{
- 			printf("gnKYOSAN_MatCommSts[ID1 - KYOSAN_SMAT_ID] = false");
- 			*Result = FALSE;
- 			return;
- 		}
-		*/
+	{
+		//KLP_EDIT
+		// 주석 처리되어 있던 Matcher(13/14) 통신 가드 복원 : Gen 가드와 동일 패턴.
+		// RFPT는 Matcher Preset 위치를 AO로 능동 제어하므로, 통신 두절 상태에서의 쓰기를 거부하여 stale 버퍼 전송을 방지.
+		if(gnKYOSAN_MatCommSts[ID1 - KYOSAN_SMAT_ID] == FALSE)
+		{
+			printf("gnKYOSAN_MatCommSts[ID1 - KYOSAN_SMAT_ID] = false\n");
+			*Result = FALSE;
+			return;
+		}
 	}
 	else if(ID1 >= MFC1_ID && ID1 <= MFC10_ID)
 	{
